@@ -3,6 +3,18 @@
 Create anki decks based on Images, using Gemini API and `genanki`. 
 Currently built for DE -> JP (German to Japanese) including automatic Masu -> Dictionary Form cards for verbs, but can theoretically be adapted for any language.
 
+## Preview
+<table>
+  <tr>
+    <td align="center"><b>Input (image.png)</b></td>
+    <td align="center"><b>Result in Anki</b></td>
+  </tr>
+  <tr>
+    <td><img src="assets/preview1.png" width="400"></td>
+    <td><img src="assets/preview2.png" width="400"></td>
+  </tr>
+</table>
+
 ## How to use
 1. **Clone the repository:**
 
