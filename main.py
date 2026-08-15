@@ -81,9 +81,9 @@ normal_vocabs = genanki.Model(
     MODEL_ID_NORMAL,
     'Normal Model',
     fields=[
+        {'name': 'Japanese'},
         {'name': 'Translation'},
         {'name': 'Translation Details'},
-        {'name': 'Japanese'},
         {'name': 'Information'},
     ],
     templates=[
@@ -133,7 +133,7 @@ for card in deck.cards:
             )
         my_note = genanki.Note(
                     model=normal_vocabs,
-                    fields=[card.translation, card.details or "",card.japanese,card.information or ""]
+                    fields=[card.japanese, card.translation, card.details or "", card.information or ""]
             )
         my_deck.add_note(my_note_masu)
         my_deck.add_note(my_note)
@@ -141,7 +141,7 @@ for card in deck.cards:
     else:
         my_note = genanki.Note(
             model=normal_vocabs,
-            fields=[card.translation, card.details or "",card.japanese,card.information or ""]
+            fields=[card.japanese, card.translation, card.details or "", card.information or ""]
         )
         my_deck.add_note(my_note)
     
