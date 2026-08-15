@@ -1,0 +1,116 @@
+<!---------------------------->
+<!---- Background Objects ---->
+<!---------------------------->
+
+<div class="design_object">
+</div>
+
+<!-------------------------->
+<!---- Flashcard Object ---->
+<!-------------------------->
+
+<div class="flashcard">
+
+	<!------------------>
+	<!---- Question ---->
+	<!------------------>
+
+	<div class="question" id="C3_B_Q">
+
+		<div class="japanese masu-form">
+			{{furigana:Masu Form}}
+		</div>
+
+	</div>
+
+	<!---------------->
+	<!---- Answer ---->
+	<!---------------->
+
+	<div class="answer" id="C3_B_A">
+
+		<div class="japanese dictionary-form">
+			{{furigana:Dictionary Form}}
+		</div>
+
+		<div class="japanese input dictionary-form">
+			{{type:Dictionary Form}}
+		</div>
+
+	</div>
+
+</div>
+
+<!--------------------->
+<!---- Utility Bar ---->
+<!--------------------->
+
+<ul class="utility bar">
+
+	<li class="linknicon" id="google">
+		<a href="https://www.google.com/search?q={{kanji:Dictionary Form}}">
+			<img src="_google_512x512.png")>
+			<span class="link_text">&nbspGoogle</span>
+		</a>
+	</li>
+
+	<li class="pronounciation_desktop">
+		{{tts ja_JP speed=0.75:kana:Dictionary Form}}
+	</li>
+
+	<li class="pronounciation_mobile">
+		<tts service="android" voice="ja_JP">{{kana:Dictionary Form}}</tts>
+	</li>
+
+	<li class="linknicon" id="translate">
+		<a href="https://translate.google.com/?hl=de&sl=ja&tl=de&text={{kanji:Dictionary Form}}&op=translate">
+			<img src="_google-translate_32x32.png")>
+			<span class="link_text">&nbspTranslate</span>
+		</a>
+	</li>
+
+		
+	<li class="linknicon" id="takoboto">
+		<a href="https://takoboto.jp/?q={{kanji:Dictionary Form}}">
+			<img src="_takoboto_48x48.png">
+			<span class="link_text">&nbspTakoboto</span>
+		</a>
+	</li>
+
+</ul>
+
+<!-------------------->
+<!---- Footer Bar ---->
+<!-------------------->
+
+<ul class="footer bar">
+
+	<li class="credits" id="github">
+		<a class="credits_text">Theme by&nbsp</span>
+		<a class="credits_link" href="https://github.com/HachiMoji">
+			<span class="link_text">HachiMoji</span>
+			<img src="_github_32x32_dark.png">
+		</a>
+	</li>
+
+</ul>
+
+<!------------------>
+<!---- Settings ---->
+<!------------------>
+
+<!-- Needed, so that audio won't play unneccessarily-->
+
+<tts service="android" voice="ja_JP"></tts>
+
+<!-------------------->
+<!---- Javascript ---->
+<!-------------------->
+
+<script>
+document.getElementById("typearrow").innerHTML = "&#8681"
+</script>
+
+<!--
+<script src="_mnn_study_modes.js"></script>
+-->

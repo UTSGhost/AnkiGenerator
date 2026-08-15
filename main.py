@@ -16,18 +16,35 @@ test_key = os.getenv("GEMINI_API_KEY")
 class Card(BaseModel):
     translation: str = Field(description="The translated word")
     details: Optional[str] = Field(description="optional details for translation (front)")
-    masu: str = Field(description="The original word")
+    masu: Optional[str] = Field(description="optional masu form when its a japanese verb (front) HAS TO BE EMPTY IF ITS NOT A JAPANESE VERB!")
+    japanese: str = Field(description="The original word")
     information: Optional[str] = Field(description="optional explanations and additions (back)")
+    dictionary: Optional[str] = Field(description="optional dictionary form when its a japanese verb (back) HAS TO BE EMPTY IF ITS NOT A JAPANESE VERB!")
 
 class Deck(BaseModel):
     cards: List[Card]
 
 client = genai.Client()
-
 image = client.files.upload(file="image.png")
 
-prompt = "Please extract following words from the Image. On the left column, you have the translated words for front side cards. on the right side, you have the original words for the back side.  Also, make sure to fix any obvious spelling mistakes. If the word is difficult/ambiguous, feel free to add the optional data details and informations on the card."
+with (
+    open("front.html", "r", encoding="utf-8") as f_front,
+    open("back.html", "r", encoding="utf-8") as f_back,
+    open("style.css", "r", encoding="utf-8") as f_css,
+    open("frontverb.html", "r", encoding="utf-8") as f_frontv,
+    open("backverb.html", "r", encoding="utf-8") as f_backv,
+    open("stylev.css", "r", encoding="utf-8") as f_cssv,
+    open("prompt.txt", "r", encoding="utf-8") as f_prompt
+):
+    front_html = f_front.read()
+    back_html = f_back.read()
+    css_code = f_css.read()
+    frontv_html = f_frontv.read()
+    backv_html = f_backv.read()
+    cssv_code = f_cssv.read()
+    prompt = f_prompt.read()
 
+#send data to AI
 interaction = client.interactions.create(
     model="gemini-3.6-flash",
     input=[
@@ -45,27 +62,24 @@ interaction = client.interactions.create(
     }
 )
 
-
+# should never be raised, but safer to check
 if not (interaction.output_text): # type: ignore
     raise ValueError("no output text")
 
 
 deck = Deck.model_validate_json(interaction.output_text) # type: ignore
+# for debugging
 print(deck)
 
 # necessary for genanki model -> https://darigovresearch.github.io/genanki/build/html/overview.html
-randomInt = random.randrange(1 << 30, 1 << 31)
+randomIntNormal = random.randrange(1 << 30, 1 << 31)
+randomIntVerb = random.randrange(1 << 30, 1 << 31)
+randomIntForDeck = random.randrange(1 << 30, 1 << 31)
 
-with open("front.html", "r") as f_front, open("back.html", "r") as f_back, open("style.css", "r") as f_css:
-    front_html = f_front.read()
-    back_html = f_back.read()
-    css_code = f_css.read()
-
-
-
-anki_model = genanki.Model(
-    randomInt,
-    'Simpel Model',
+# Anki Card Model for most vocabs
+normal_vocabs = genanki.Model(
+    randomIntNormal,
+    'Normal Model',
     fields=[
         {'name': 'Translation'},
         {'name': 'Translation Details'},
@@ -82,20 +96,56 @@ anki_model = genanki.Model(
     css=css_code
 )
 
-
-randomIntForDeck = random.randrange(1 << 30, 1 << 31)
-my_deck = genanki.Deck(
-    randomIntForDeck,
-    'Test Deck'
+# Anki Card Model for Masu -> Dictionary form
+verbs = genanki.Model(
+    randomIntVerb,
+    'Verb Model',
+    fields=[
+        {'name': 'Masu Form'},
+        {'name': 'Dictionary Form'},
+        {'name': 'Translation'},
+        {'name': 'Translation Details'},
+        {'name': 'Information'},
+    ],
+    templates=[
+        {
+        'name': 'Masu → Dictionary',
+        'qfmt': frontv_html,
+        'afmt': backv_html,
+        },
+    ],
+    css=cssv_code
 )
 
-for card in deck.cards:
-    my_note = genanki.Note(
-        model=anki_model,
-        fields=[card.translation,card.details or "",card.masu,card.information or ""]
-    )
-    my_deck.add_note(my_note)
+# Necessary to output as a file
+my_deck = genanki.Deck(
+    randomIntForDeck,
+    'Self Imported'
+)
 
+# go through all cards from AI output to create cards and add them to the deck
+for card in deck.cards:
+    # for verbs, create 2 different types of cards and add both to deck
+    if (card.masu):
+        my_note_masu = genanki.Note(
+                model=verbs,
+                fields=[card.masu, card.dictionary or "", card.translation, card.details or "", card.information or ""]
+            )
+        my_note = genanki.Note(
+                    model=normal_vocabs,
+                    fields=[card.translation, card.details or "",card.japanese,card.information or ""]
+            )
+        my_deck.add_note(my_note_masu)
+        my_deck.add_note(my_note)
+    # for normal verbs, only add the standard card
+    else:
+        my_note = genanki.Note(
+            model=normal_vocabs,
+            fields=[card.translation, card.details or "",card.japanese,card.information or ""]
+        )
+        my_deck.add_note(my_note)
+    
+# output can be directly inported to Anki
 genanki.Package(my_deck).write_to_file('output.apkg')
 
 

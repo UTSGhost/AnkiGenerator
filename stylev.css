@@ -1,0 +1,509 @@
+/*----------------------------------------------Information---------------------------------------------*/
+/* Version 1.0                                                                                          */
+/* Theme by HachiMoji                                                                                   */
+/* Check out https://github.com/HachiMoji/Anki-Sets for backup versions                                 */
+/*                                                                                                      */
+/*                                                                                                      */
+/* Small Tutorial:                                                                                      */
+/* <html> and <div class="card"> are predefined and not visible in the "Front Template" and "Back       */
+/* Template", but accessible for CSS styling. Here, the "card" div is stretched to the full size of the */
+/* window and reused as a container for user-defined divs. That makes designing much easier. Most of    */
+/* the names are self explanatory, but a legend is still included below.                                */
+/*                                                                                                      */
+/* Legend:                                                                                              */
+/* .flashcard = actual flashcard                                                                        */
+/* .design_object = object with accent color for design purposes                                        */
+/* .question = question field                                                                           */
+/* .answer = answer field                                                                               */
+/* .japanese = field for japanese text with furigana                                                    */
+/* .translation = field for translation                                                                 */
+/* .details = field for details                                                                         */
+/* .information = field for explanation                                                                 */
+/* #C1_F_Q = question field (Q) of the front (F) of the "JP → DE" card (C1)                             */
+/* #C2_F_Q = question field (Q) of the front (F) of the "DE → JP" card (C2)                             */
+/* #C3_F_Q = question field (Q) of the front (F) of the "Masu → Dictionary" card (C3)                   */
+/* #C2_F_A = answer field (A) of the front (F) of the "DE → JP" card (C2)                               */
+/* #C3_F_A = answer field (A) of the front (F) of the "Masu → Dictionary" card (C3)                     */
+/* #C1_B_Q = question field (Q) of the back (B) of the "JP → DE" card (C1)                              */
+/* #C2_B_Q = question field (Q) of the back (B) of the "DE → JP" card (C2)                              */
+/* #C3_B_Q = question field (Q) of the back (B) of the "Masu → Dictionary" card (C3)                    */
+/* #C1_B_A = answer field (A) of the back (B) of the "JP → DE" card (C1)                                */
+/* #C2_B_A = answer field (A) of the back (B) of the "DE → JP" card (C2)                                */
+/* #C3_B_A = answer field (A) of the back (B) of the "Masu → Dictionary" card (C3)                      */
+/* .bar = all types of bars                                                                             */
+/* .utility = bar containing utilities right under the flashcard                                        */
+/* .footer = bar containing credits at the bottom                                                       */
+/*------------------------------------------------------------------------------------------------------*/
+
+/*-------------------------------------------------------------------------------*/
+/*----------------------------------Added Media----------------------------------*/
+/*-------------------------------------------------------------------------------*/
+
+@font-face {
+  font-family: "Yu Gothic UI";
+  src: url("_YuGothicUI-Semibold-03.ttf");
+}
+
+@font-face {
+  font-family: "Yu Mincho";
+  src: url("_yumin.ttf");
+}
+
+/*----------------------------------------General View [Mobile]----------------------------------------*/
+
+/*-------------------------------------------------------------------------------*/
+/*-------------------------------------Cards-------------------------------------*/
+/*-------------------------------------------------------------------------------*/
+
+html {
+  background: none; /*should be transparent*/
+}
+
+.card {
+  margin: 0px; /*necessary*/
+  background: #f1f2f8;
+  height: auto; /*necessary*/
+  min-height: 100vh !important; /*necessary*/
+  width: auto; /*necessary*/
+  min-width: 100vw !important; /*necessary*/
+  position: fixed; /*necessary*/
+  top: 0px; /*necessary*/
+  left: 0px; /*necessary*/
+  border: 0px solid orange;
+}
+
+.design_object {
+  background: #5352ed; /*#00bab2*/
+  height: 10vh;
+  width: 100vw;
+  border-radius: 0px 0px 2.5vh 2.5vh;
+  position: fixed; /*necessary*/
+  top: 0px; /*necessary*/
+  left: 0px; /*necessary*/
+}
+
+.flashcard {
+  text-align: center;
+  margin: 7.5vh auto 2vh auto; /*necessary*/
+  width: 80%; /*necessary*/
+  max-width: 800px;
+  position: relative; /*necessary*/
+  color: #000;
+  background: #fff;
+  font-family: arial;
+  padding: 2.5vh 2.5vh 2.5vh 2.5vh;
+  border-radius: 2.5vh 2.5vh 2.5vh 2.5vh;
+  word-break: keep-all; /*necessary*/
+  border: 0px solid red;
+}
+
+/*-------------------------------------------------*/
+/* For the answer container of the back sides only */
+/*-------------------------------------------------*/
+
+#C1_B_A,
+#C2_B_A,
+#C3_B_A {
+  margin-top: 1.5vh;
+  border-top: 0.125vh dashed #5352ed;
+}
+
+/*-----------------------------------------------------------------------*/
+/* For the containers inside the answer container of the back sides only */
+/*-----------------------------------------------------------------------*/
+
+#C1_B_A > div,
+#C2_B_A > div,
+#C3_B_A > div {
+  margin-top: 1.5vh;
+}
+
+/*-----------------------------------------------------------------------------------------------*/
+/* For the answer container of the front side of the "DE → JP" and "Masu → Dictionary" card only */
+/*-----------------------------------------------------------------------------------------------*/
+
+#C2_F_A,
+#C3_F_A {
+  margin-top: 2.5vh;
+  border-top: 0.125vh dashed #5352ed;
+}
+
+/*---------------------------------------------------------------------------------------------------------------------*/
+/* For the containers inside the answer container of the front side of the "DE → JP" and "Masu → Dictionary" card only */
+/*---------------------------------------------------------------------------------------------------------------------*/
+
+#C2_F_A > div,
+#C3_F_A > div {
+  margin-top: 2.5vh;
+}
+
+/*----------------------------------------------------------------------------------------------------------------------*/
+/* For the japanese input container inside the answer container of the "DE → JP" and "Masu → Dictionary" and cards only */
+/*----------------------------------------------------------------------------------------------------------------------*/
+
+#C2_F_A > .japanese,
+#C2_B_A > .japanese,
+#C3_F_A > .japanese,
+#C3_B_A > .japanese {
+  font-size: 2.5vh;
+}
+
+/*------------------------*/
+/* Actual text containers */
+/*------------------------*/
+
+.translation {
+  font-size: 2.5vh;
+  border: 0px solid pink;
+}
+
+.japanese,
+.input {
+  font-size: 3vh;
+  font-family: Yu Mincho;
+  border: 0px solid orange;
+}
+
+.information,
+.details {
+  color: #5352ed;
+  font-size: 2.5vh;
+  border: 0px solid fuchsia;
+}
+
+/*-------------------------------------------------------------------------------*/
+/*-----------------------------------Furigana------------------------------------*/
+/*-------------------------------------------------------------------------------*/
+
+.japanese ruby rt {
+  font-size: 1.5vh;
+}
+
+/*-------------------------------------------------------------------------------*/
+/*--------------------------------------Bars-------------------------------------*/
+/*-------------------------------------------------------------------------------*/
+
+.bar {
+  background: #fff;
+  font-size: 1.5vh;
+  display: flex;
+  align-items: center;
+  list-style-type: none;
+  padding: 0vw;
+}
+
+.utility {
+  height: 3.5vh;
+  border-radius: 2.5vh;
+  margin: 0vw auto 4.5vh auto; /*necessary*/
+  width: 80%; /*necessary*/
+  max-width: 800px;
+  position: relative; /*necessary*/
+  padding: 0vw 2.5vh 0vw 2.5vh;
+}
+
+.footer {
+  height: 3.5vh;
+  width: 100vw;
+  border-radius: 2.5vh 2.5vh 0vw 0vw;
+  position: fixed; /*necessary*/
+  bottom: 0px; /*necessary*/
+  left: 0px; /*necessary*/
+  margin: 0vw 0vw 0vw 0vw;
+}
+
+/*-------------------------------------------------------------------------------*/
+/*----------------------------Japanese Pronounciation----------------------------*/
+/*-------------------------------------------------------------------------------*/
+
+.pronounciation_desktop {
+  border: 0px solid white;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.play_button {
+  border: 0px solid brown;
+}
+
+.replay-button {
+  border: 0px solid green;
+}
+
+.replay-button svg {
+  border: 0px solid blue;
+  width: 2.5vh;
+  height: 2.5vh;
+}
+
+/*-------------------------------------------------------------------------------*/
+/*-------------------------------------Links-------------------------------------*/
+/*-------------------------------------------------------------------------------*/
+
+.linknicon {
+  display: flex;
+  flex: 1;
+}
+
+.linknicon a {
+  border: 0px solid black;
+  color: #5352ed;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.linknicon a img {
+  border: 0px solid green;
+  height: 1.5vh;
+  width: 1.5vh;
+  margin-right: 0vh;
+}
+
+.link_text {
+  border: 0px solid orange;
+}
+
+#google {
+  justify-content: flex-start;
+}
+
+#translate {
+  justify-content: center;
+}
+
+#takoboto {
+  justify-content: flex-end;
+}
+
+/*-------------------------------------------------------------------------------*/
+/*---------------------------------Theme Credits---------------------------------*/
+/*-------------------------------------------------------------------------------*/
+
+.credits {
+  border: 0px solid orange;
+  display: flex;
+  flex: 1;
+}
+
+.credits a {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0vh;
+}
+
+.credits_text {
+  color: #000;
+}
+
+.credits_link {
+  color: #3f79b5;
+}
+
+.credits a img {
+  border: 0px solid green;
+  height: 1.5vh;
+  width: 1.5vh;
+  margin-left: 0.5vh;
+}
+
+#github {
+  justify-content: center;
+}
+
+/*-------------------------------------------------------------------------------*/
+/*-------------------------Settings for type-in function-------------------------*/
+/*-------------------------------------------------------------------------------*/
+
+.input {
+  display: none; /*Should only be activated for apps, not the web*/
+}
+
+.typePrompt {
+  display: none;
+}
+
+/*------------------------------*/
+/* Input field on the front card*/
+/*------------------------------*/
+
+input#typeans {
+  font-family: Yu Gothic UI Semibold !important;
+  text-align: center;
+  font-size: 2.5vh !important;
+  height: auto;
+  border-radius: 1vh;
+}
+
+/*------------------------------*/
+/* Input result on the back card*/
+/*------------------------------*/
+
+code#typeans {
+  font-family: Yu Gothic UI Semibold;
+  text-align: center;
+  font-size: 2.5vh;
+  height: 2.5vh;
+  border: 0px solid yellow;
+}
+
+code#typeans > br {
+  margin: 0.5vh !important;
+}
+
+#typearrow {
+  font-size: 3.5vh;
+}
+
+#typecheckmark {
+  margin-left: 2vh;
+  content: "&#10003/*&#x2714*/";
+}
+
+.typeGood {
+  background: #18ad86;
+}
+
+.typeBad {
+  background: #ad1838;
+}
+
+.typeMissed {
+  background: grey;
+}
+
+/*--------------------Conditional formatting for desktop devices with wide viewports--------------------*/
+
+@media only screen and (min-device-aspect-ratio: 9/16) and (min-aspect-ratio: 9/16) {
+  .design_object {
+    height: 15vh; /*necessary*/
+  }
+
+  .flashcard {
+    margin: 12.5vh auto 2vh auto; /*necessary*/
+  }
+
+  code#typeans {
+    font-size: 2.5vh;
+  }
+
+  input#typeans {
+    font-size: 2.5vh !important;
+    height: auto;
+  }
+
+  #typearrow {
+    font-size: 2.5vh;
+  }
+}
+
+/*--------------------------------------Nightmode [Desktop][Mobile]-------------------------------------*/
+
+/*-------------------------------------------------------------------------------*/
+/*-----------------------------------[Desktop]-----------------------------------*/
+/*-------------------------------------------------------------------------------*/
+
+.nightMode .design_object {
+  background: #403fb6;
+}
+
+.card.nightMode {
+  background-color: #070708;
+}
+
+.nightMode .flashcard,
+.nightMode .bar {
+  color: #fff;
+  background: #000;
+}
+
+.nightMode #C1_B_A,
+.nightMode #C2_B_A,
+.nightMode #C2_F_A {
+  border-color: #403fb6;
+}
+
+.nightMode .information,
+.nightMode .details {
+  color: #403fb6;
+}
+
+.nightMode .linknicon a {
+  color: #403fb6;
+}
+
+.nightMode .credits_text {
+  color: #fff;
+}
+
+.nightMode .credits_link {
+  color: #403fb6;
+}
+
+/*-------------------------------------*/
+/* Change github logo to light version */
+/*-------------------------------------*/
+
+.nightMode .credits a img {
+  content: url(_github_32x32_light.png);
+}
+
+/*---------------------------------------------Deactivations--------------------------------------------*/
+
+/*-------------------------------------------------------------------------------*/
+/*-----------------------------------[Mobile]------------------------------------*/
+/*-------------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*/
+/* For the answer container of the front side of the "DE → JP" card and       */
+/* and the input field on the front side of the "Masu → Dictionary" card only */
+/*----------------------------------------------------------------------------*/
+
+.mobile #C2_F_A,
+.mobile #C3_F_A > .input {
+  display: none;
+  margin-top: 0vw;
+  border-top: none;
+}
+/* Comment: Needs to be turned off since the mobile input field is different. */
+
+/*---------------------------------------------------------------------------------------------*/
+/* For the containers inside the answer container of the front side of the "DE → JP" card only */
+/*---------------------------------------------------------------------------------------------*/
+
+.mobile #C2_F_A > div {
+  margin-top: 0vw;
+}
+
+.mobile .pronounciation_desktop {
+  display: none;
+}
+
+/*-------------------------------------------------------------------------------*/
+/*-----------------------------------[Desktop]-----------------------------------*/
+/*-------------------------------------------------------------------------------*/
+
+.win .pronounciation_mobile,
+.mac .pronounciation_mobile,
+.linux:not(.android) .pronounciation_mobile,
+.pronounciation_mobile /*remove, when Japanese TTS is supported on Anki for phones*/ {
+  display: none;
+}
+
+.win #translate,
+.mac #translate,
+.linux:not(.android) #translate {
+  display: none;
+}
+
+.win .input,
+.mac .input,
+.linux .input,
+.mobile .input {
+  display: block;
+}

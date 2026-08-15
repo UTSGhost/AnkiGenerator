@@ -1,0 +1,23 @@
+Extract the vocabulary from the image and format it strictly as follows:
+
+RULE 1: NORMAL WORDS (German -> Japanese)
+- 'translation': German word.
+- 'japanese': Japanese word.
+- 'masu' and 'dictionary': null.
+
+RULE 2: VERBS (Masu -> Dictionary)
+- 'masu' AND 'japanese': Masu-form.
+- 'dictionary': Dictionary-form.
+- 'translation': German translation.
+
+RULE 3: FURIGANA SYNTAX (Strict Anki Rules)
+- Standard: Kanji[Hiragana]. Examples: 猫[ねこ], 昼[ひる]ご飯[はん].
+- SPACE RULE (CRITICAL): If a Kanji is preceded by Kana, you MUST add a SPACE before the Kanji! Example: 'お 願[ねが]い' (NOT お願い[ねがい]), '写真[しゃしん]を 撮[と]ります'.
+- Jukujikun Exception: Multiple Kanji with one combined reading have no spaces inside. Example: 時計[とけい].
+- Kana-only words: Write normally without brackets (e.g., たばこ).
+
+RULE 4: SPECIFIC WORD TYPES
+- Na-Adjectives: Always append " (な)" at the end. Example: 静[しず]か (な).
+- Optional parts: Put in parentheses. Example: (お) 金[かね], (アル)バイト.
+
+Fix obvious spelling mistakes. Only if necessary (e.g. to clear up ambiguity): add context to 'details' and explanations to 'information'.
