@@ -16,7 +16,7 @@ Currently built for DE -> JP (German to Japanese) including automatic Masu -> Di
     ```
 3. **Set up your API Key:**
 Create a .env file in the root directory and add your Google Gemini API key:
-    ```bash
+    ```env
     GEMINI_API_KEY="your_api_key_here"
     ```
 4. **Run the script:** Place your vocabulary image as image.png in the root folder and run:
