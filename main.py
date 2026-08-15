@@ -14,12 +14,12 @@ test_key = os.getenv("GEMINI_API_KEY")
 
 
 class Card(BaseModel):
-    translation: str = Field(description="The translated word")
-    details: Optional[str] = Field(description="optional details for translation (front)")
-    masu: Optional[str] = Field(description="optional masu form when its a japanese verb (front) HAS TO BE EMPTY IF ITS NOT A JAPANESE VERB!")
-    japanese: str = Field(description="The original word")
-    information: Optional[str] = Field(description="optional explanations and additions (back)")
-    dictionary: Optional[str] = Field(description="optional dictionary form when its a japanese verb (back) HAS TO BE EMPTY IF ITS NOT A JAPANESE VERB!")
+    translation: str = Field(description="The German translation of the word.")
+    details: Optional[str] = Field(description="Optional clarification if the German word is ambiguous (e.g. to distinguish between different Japanese translations).")
+    masu: Optional[str] = Field(description="Masu-form if it is a Japanese verb; null otherwise.")
+    japanese: str = Field(description="The Japanese word")
+    information: Optional[str] = Field(description="Optional explanations or additions for the back side.")
+    dictionary: Optional[str] = Field(description="Dictionary-form if it is a Japanese verb; null otherwise.")
 
 class Deck(BaseModel):
     cards: List[Card]
@@ -46,7 +46,7 @@ with (
 
 #send data to AI
 interaction = client.interactions.create(
-    model="gemini-3.6-flash",
+    model="gemini-3.7-flash",
     input=[
         {"type": "text", "text": prompt},
         {
