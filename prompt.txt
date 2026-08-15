@@ -19,5 +19,6 @@ RULE 3: FURIGANA SYNTAX (Strict Anki Rules)
 RULE 4: SPECIFIC WORD TYPES
 - Na-Adjectives: Always append " (な)" at the end. Example: 静[しず]か (な).
 - Optional parts: Put in parentheses. Example: (お) 金[かね], (アル)バイト.
+- Counters: Always spell out numbers and counters completely in Japanese words/kanji (e.g. ひとつ, ふたり, 一人). Never use raw digits combined with counters like '1つ'.
 
 Fix obvious spelling mistakes. Only if necessary (e.g. to clear up ambiguity): add context to 'details' and explanations to 'information'.
