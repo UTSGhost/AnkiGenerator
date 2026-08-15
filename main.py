@@ -15,7 +15,7 @@ test_key = os.getenv("GEMINI_API_KEY")
 
 class Card(BaseModel):
     translation: str = Field(description="The German translation of the word.")
-    details: Optional[str] = Field(description="Optional clarification if the German word is ambiguous (e.g. to distinguish between different Japanese translations).")
+    details: Optional[str] = Field(description="Optional clarification only if the German word is ambiguous (e.g. to distinguish between different Japanese translations).")
     masu: Optional[str] = Field(description="Masu-form if it is a Japanese verb; null otherwise.")
     japanese: str = Field(description="The Japanese word")
     information: Optional[str] = Field(description="Optional explanations or additions for the back side.")
