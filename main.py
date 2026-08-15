@@ -28,12 +28,12 @@ client = genai.Client()
 image = client.files.upload(file="image.png")
 
 with (
-    open("front.html", "r", encoding="utf-8") as f_front,
-    open("back.html", "r", encoding="utf-8") as f_back,
-    open("style.css", "r", encoding="utf-8") as f_css,
-    open("frontverb.html", "r", encoding="utf-8") as f_frontv,
-    open("backverb.html", "r", encoding="utf-8") as f_backv,
-    open("stylev.css", "r", encoding="utf-8") as f_cssv,
+    open("templates/front.html", "r", encoding="utf-8") as f_front,
+    open("templates/back.html", "r", encoding="utf-8") as f_back,
+    open("templates/style.css", "r", encoding="utf-8") as f_css,
+    open("templates/frontverb.html", "r", encoding="utf-8") as f_frontv,
+    open("templates/backverb.html", "r", encoding="utf-8") as f_backv,
+    open("templates/stylev.css", "r", encoding="utf-8") as f_cssv,
     open("prompt.txt", "r", encoding="utf-8") as f_prompt
 ):
     front_html = f_front.read()
