@@ -1,0 +1,73 @@
+<!---------------------------->
+<!---- Background Objects ---->
+<!---------------------------->
+
+<div class="design_object">
+</div>
+
+<!-------------------------->
+<!---- Flashcard Object ---->
+<!-------------------------->
+
+<div class="flashcard">
+
+	<!------------------>
+	<!---- Question ---->
+	<!------------------>
+
+	<div class="question" id="C2_F_Q">
+
+		<div class="translation">
+			{{Translation}}
+		</div>
+
+		{{#Translation Details}}
+			<div class="details">
+				{{furigana:Translation Details}}
+			</div>
+		{{/Translation Details}}
+
+	</div>
+
+	<!---------------->
+	<!---- Answer ---->
+	<!---------------->
+
+	<div class="answer input" id="C2_F_A">
+
+		<div class="japanese">
+			{{type:Japanese}}
+		</div>
+
+	</div>
+
+</div>
+
+<!----------------------->
+<!---- Footer Object ---->
+<!----------------------->
+
+<ul class="footer bar">
+
+	<li class="credits" id="github">
+		<a class="credits_text">Theme by&nbsp</span>
+		<a class="credits_link" href="https://github.com/HachiMoji">
+			<span class="link_text">HachiMoji</span>
+			<img src="_github_32x32_dark.png">
+		</a>
+	</li>
+
+</ul>
+
+<!------------------>
+<!---- Settings ---->
+<!------------------>
+
+<!-- Needed, so that audio won't play unneccessarily-->
+
+<tts service="android" voice="de_DE"></tts>
+
+<!-------------------->
+<!---- Javascript ---->
+<!-------------------->
+
