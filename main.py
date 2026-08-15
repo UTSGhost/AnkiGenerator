@@ -72,13 +72,13 @@ deck = Deck.model_validate_json(interaction.output_text) # type: ignore
 print(deck)
 
 # necessary for genanki model -> https://darigovresearch.github.io/genanki/build/html/overview.html
-randomIntNormal = random.randrange(1 << 30, 1 << 31)
-randomIntVerb = random.randrange(1 << 30, 1 << 31)
-randomIntForDeck = random.randrange(1 << 30, 1 << 31)
+MODEL_ID_NORMAL = 1638294712
+MODEL_ID_VERB = 1847201948
+DECK_ID = 1482930491
 
 # Anki Card Model for most vocabs
 normal_vocabs = genanki.Model(
-    randomIntNormal,
+    MODEL_ID_NORMAL,
     'Normal Model',
     fields=[
         {'name': 'Translation'},
@@ -98,7 +98,7 @@ normal_vocabs = genanki.Model(
 
 # Anki Card Model for Masu -> Dictionary form
 verbs = genanki.Model(
-    randomIntVerb,
+    MODEL_ID_VERB,
     'Verb Model',
     fields=[
         {'name': 'Masu Form'},
@@ -119,7 +119,7 @@ verbs = genanki.Model(
 
 # Necessary to output as a file
 my_deck = genanki.Deck(
-    randomIntForDeck,
+    DECK_ID,
     'Self Imported'
 )
 
