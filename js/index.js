@@ -1,7 +1,7 @@
 import * as z from "https://esm.sh/zod";
 
-const GEMINI_API_KEY = "API-KEY-HERE";
-const GEMINI_MODEL = "gemini-3.5-flash-lite"; //change to your preferred model
+const GEMINI_API_KEY = "APIKEYHERE";
+const GEMINI_MODEL = "gemini-3.7-flash"; //change to your preferred model
 
 const MODEL_ID_NORMAL = 1638294712
 const MODEL_ID_VERB = 1847201948
@@ -204,6 +204,9 @@ async function fetchAi(b64, type){
                         required: ["translation", "japanese"]
                     }
                 }
+            },
+            generation_config: {
+                temperature: 0
             }
         })
     });
@@ -211,7 +214,7 @@ async function fetchAi(b64, type){
     // some API error
     if (!response.ok) {
         console.error("GOOGLE API ERROR:", JSON.stringify(json, null, 2));
-        throw new Error(response.error?.message || "Unknown API-Errro");
+        throw new Error(response.error?.message || "Unknown API-Error");
     }
     // weird way to extract important data from response because nothing else works
     let jsonString = null;
