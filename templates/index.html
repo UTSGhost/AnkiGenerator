@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anki Generator</title>
-</head>
-<body>
-input file:
-<form method="POST" enctype="multipart/form-data">
-  <input type="file" name="file">
-  <button type="submit">upload</button>
-</form>
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="/static/style.css" type="text/css">
+      <title>Anki Generator</title>
+  </head>
+  <body>
+    input file:
+    <form id="upload-form" method="POST" enctype="multipart/form-data">
+      <input type="file" name="file">
+      <button type="submit">upload</button>
+    </form>
+    <div id="loader">Loading...</div>
 
-</body>
+    <script type="text/javascript" src="/static/script.js"></script>
+  </body>
 </html>

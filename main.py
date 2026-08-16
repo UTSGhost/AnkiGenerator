@@ -43,8 +43,11 @@ def upload_file():
             filename = secure_filename(file.filename) # type: ignore
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
+            # AI request
             json = requestJson(filepath)
+            # genanki deck generation
             output_path = createDeck(json)
+            # as attachment to download
             return send_file(output_path,as_attachment=True)
     return "bad file"
 
