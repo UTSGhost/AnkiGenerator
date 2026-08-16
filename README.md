@@ -1,12 +1,14 @@
-# AI-Image-to-Anki
+# AI-Image-to-Anki (Fullstack Web-Server Version)
 
 Create anki decks based on Images, using Gemini API and `genanki`. 
+**This branch features a Fullstack Web Application using Vanilla JS & Flask.** The backend handles API communication securely (hiding the API key from the client) and generates the deck server-side before sending it to the user.
+
 Currently built for DE -> JP (German to Japanese) including automatic Masu -> Dictionary Form cards for verbs, but can theoretically be adapted for any language.
 
 ## Preview
 <table>
   <tr>
-    <td align="center"><b>Input (image.png)</b></td>
+    <td align="center"><b>Web Interface Input</b></td>
     <td align="center"><b>Result in Anki</b></td>
   </tr>
   <tr>
@@ -16,28 +18,31 @@ Currently built for DE -> JP (German to Japanese) including automatic Masu -> Di
 </table>
 
 ## How to use
-1. **Clone the repository:**
-
+1. **Clone the repository and switch branch:**
    ```bash
    git clone https://github.com/UTSGhost/AnkiGenerator
    cd AnkiGenerator
+   git checkout web-app
    ```
+
 2. **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+   ```bash
+   pip install -r requirements.txt
+   ```
+
 3. **Set up your API Key:**
-Create a .env file in the root directory and add your Google Gemini API key:
-    ```env
-    GEMINI_API_KEY="your_api_key_here"
-    ```
-4. **Run the script:** Place your vocabulary image as image.png in the root folder and run:
-    ```bash
-    python main.py
-    ```
-The generated output.apkg can then be directly imported into Anki
+   Create a `.env` file in the root directory and add your Google Gemini API key:
+   ```env
+   GEMINI_API_KEY="your_api_key_here"
+   ```
+
+4. **Start the Web Server:** 
+   ```bash
+   python -m flask run
+   ```
+
+5. **Generate Cards:**
+   Open your browser and navigate to `http://127.0.0.1:5000`. Upload your vocabulary image via the web interface and wait for the `.apkg` file to download automatically.
 
 ## Credits & Sources
-
 Anki Theme / Formatting: Based on the awesome [HachiMoji Theme](https://ankiweb.net/shared/info/1367938531).
-

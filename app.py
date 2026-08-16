@@ -1,6 +1,5 @@
 from google import genai
 import os
-import io
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from typing import List, Optional
@@ -90,7 +89,7 @@ def requestJson(filepath):
     gemini_input_file = client.files.upload(file=filepath)
 
     interaction = client.interactions.create(
-        model="gemini-3.6-flash",
+        model="gemini-3.7-flash",
         input=[
             {"type": "text", "text": prompt},
             {
@@ -103,6 +102,11 @@ def requestJson(filepath):
             "type": "text",
             "mime_type": "application/json",
             "schema": Deck.model_json_schema()
+        },
+        extra_body={
+            "generation_config": {
+                "temperature": 0.0
+            }
         }
     )
 
