@@ -31,7 +31,7 @@ Currently built for DE -> JP (German to Japanese) including automatic Masu -> Di
    * Or using VS Code: Install the "Live Server" extension and click "Go Live".
 
 3. **Generate Cards:**
-   Open the application in your browser (e.g., [http://127.0.0.1:5500](http://127.0.0.1:5500)). 
+   Open the application in your browser (e.g., `http://127.0.0.1:5000`). 
    * Enter your Google Gemini API Key directly into the secure UI field (it remains in your browser and is never sent anywhere but Google).
    * Upload your vocabulary image.
    * The browser will process the AI response and download the generated `.apkg` file automatically.
