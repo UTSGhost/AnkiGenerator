@@ -10,7 +10,7 @@ import random
 load_dotenv()
 test_key = os.getenv("GEMINI_API_KEY")
 # for debugging only
-# print(f"Erkannter Key: {test_key}") 
+# print(f"Key: {test_key}") 
 
 
 class Card(BaseModel):
