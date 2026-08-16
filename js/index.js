@@ -1,21 +1,19 @@
 import * as z from "https://esm.sh/zod";
 
-const Card_normal = z.object({ 
-  username: z.string(),
-  xp: z.number()
-});
-
-const Card_verb = z.object({ 
-  username: z.string(),
-  xp: z.number()
-});
-
+// zod schema for verification
 const Card = z.object({ 
-  username: z.string(),
-  xp: z.number()
+  translation: z.string(),
+  details: z.string().optional(),
+  masu: z.string().optional(),
+  japanese: z.string(),
+  information: z.string().optional(),
+  dictionary: z.string().optional(),
 });
 
-const GEMINI_API_KEY;
+const Deck = z.array(Card);
+
+// TODO
+const GEMINI_API_KEY = "API_KEY_HERE";
 
 document.getElementById("upload-form").addEventListener("submit", displayLoad);
 
@@ -35,7 +33,7 @@ async function displayLoad(event){
 
         const json = await fetchAi(b64, file.type);
         
-
+        console.log(json);
 
 
 
@@ -86,60 +84,73 @@ async function fileTob64(file){
 }
 
 async function fetchAi(b64, type){
-    const json = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
+    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
         method: "POST",
         headers: {
             "x-goog-api-key": GEMINI_API_KEY,
             "Content-Type": "application/json",
         },
-        body: {
-            "model": "gemini-3.6-flash",
-            "input": [
+        body: JSON.stringify({
+            model: "gemini-3.6-flash",
+            input: [
                 {
-                    "type": "text", 
-                    "text": getPrompt()
+                    type: "text", 
+                    text: await getPrompt()
                 },
                 {
-                    "type": "image",
-                    "data": b64,
-                    "mime_type": type
+                    type: "image",
+                    data: b64,
+                    mime_type: type
                 }
             ],
-            "response_format": {
-                "type": "text",
-                "mime_type": "application/json",
-                "schema": {
-                "type": "object",
-                "properties": {
-                    "recipe_name": {
-                        "type": "string",
-                        "description": "The name of the recipe."
-                    },
-                    "prep_time_minutes": {
-                        "type": "integer",
-                        "description": "Optional time in minutes to prepare the recipe."
-                    },
-                    "ingredients": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                            "name": { "type": "string", "description": "Name of the ingredient."},
-                            "quantity": { "type": "string", "description": "Quantity of the ingredient, including units."}
-                            },
-                            "required": ["name", "quantity"]
-                        }
-                    },
-                },
-                "required": ["recipe_name", "ingredients", "instructions"]}
+            response_format: { 
+                type: "text",
+                mime_type: "application/json",
+                schema: { // same as Zod schema
+                    type: "array",
+                    items: {
+                        type: "object",
+                        properties: {
+                            translation: { type: "string" },
+                            details: { type: "string" },
+                            masu: { type: "string" },
+                            japanese: { type: "string" },
+                            information: { type: "string" },
+                            dictionary: { type: "string" }
+                        },
+                        required: ["translation", "japanese"]
+                    }
+                }
             }
-        }
-
-    })
+        })
+    });
+    const json = await response.json();
+    // maybe not needed? else to unpack response to real JSON
+    const jsonString = data.output || data.candidates[0].content.parts[0].text;
+    //return array
+    return JSON.parse(jsonString);
 }
 
 async function getPrompt() {
     const response = await fetch('prompt.txt');
     const promptText = await response.text();
     return promptText;
+}
+
+config = {
+    locateFile: filename => `/js/sql/sql-wasm.wasm`
+}
+
+var SQL;
+initSqlJs(config).then(function (sql) {
+    //Create the database
+    SQL = sql;
+});
+
+function createDeck(json){
+    var deck = new Deck(1276438724672, "Self Imported");
+
+    json.array.forEach(card => {
+        
+    });
 }
