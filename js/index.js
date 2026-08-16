@@ -1,6 +1,7 @@
 import * as z from "https://esm.sh/zod";
 
 const GEMINI_API_KEY = "API-KEY-HERE";
+const GEMINI_MODEL = "gemini-3.5-flash-lite"; //change to your preferred model
 
 const MODEL_ID_NORMAL = 1638294712
 const MODEL_ID_VERB = 1847201948
@@ -103,17 +104,10 @@ async function uploadFile(event){
     
     try {
         await sqlReady;
-
         const b64 = await fileTob64(file);
-
         const json = await fetchAi(b64, file.type);
-        console.log(json)
-
         const validData = ZodDeck.parse(json);
-        console.log(validData)
-
         createDeck(validData);
-        console.log("Deck erfolgreich erstellt!", validData);
     } catch (error) {
         // display error
         console.error("Error:", error);
@@ -145,7 +139,16 @@ async function fileTob64(file){
     })
 }
 
+/**
+ * Uses Gemini API to return an array of Anki cards based on image provided
+ * 
+ * @param {string} b64 The image encoded in base64 format.
+ * @param {string} type The MIME type of the image
+ * @returns {Promise<Array<Object>>} A promise that resolves to an array of structured Anki card objects.
+ * @throws {Error} Throws an error if the API cannot be reached or the response is empty.
+ */
 async function fetchAi(b64, type){
+    // send request to Gemini API via REST
     const response = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
         method: "POST",
         headers: {
@@ -153,7 +156,7 @@ async function fetchAi(b64, type){
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            model: "gemini-3.5-flash-lite",
+            model: GEMINI_MODEL,
             input: [
                 {
                     type: "text", 
@@ -204,14 +207,13 @@ async function fetchAi(b64, type){
             }
         })
     });
-
     const json = await response.json();
-
+    // some API error
     if (!response.ok) {
         console.error("GOOGLE API ERROR:", JSON.stringify(json, null, 2));
         throw new Error(response.error?.message || "Unknown API-Errro");
     }
-    // weird way because thats Gemini API with REST for you
+    // weird way to extract important data from response because nothing else works
     let jsonString = null;
     if (json.steps) {
         for (const step of json.steps) {
@@ -228,11 +230,10 @@ async function fetchAi(b64, type){
     if (!jsonString) {
         jsonString = json.output_text;
     }
-    // still empty response
+    // empty response
     if (!jsonString) {
         throw new Error("No API response");
     }
-    //return array
     return JSON.parse(jsonString);
 }
 
