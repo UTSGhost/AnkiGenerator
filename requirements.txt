@@ -1,4 +1,0 @@
-google-genai
-pydantic
-genanki
-python-dotenv
