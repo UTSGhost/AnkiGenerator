@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import genanki
-import random
 
 # put your Gemini API key into .env in root
 load_dotenv()
