@@ -1,12 +1,14 @@
-# AI-Image-to-Anki
+# AI-Image-to-Anki (Serverless / Client-Side Version)
 
-Create anki decks based on Images, using Gemini API and `genanki`. 
+Create anki decks based on Images, using Gemini API and `genanki-js`. 
+**This branch features a 100% Serverless Architecture.** The app runs entirely in your browser using JavaScript, WebAssembly (`sql.js`), and `zod` for AI response validation. No backend or Python required! It communicates directly with the Gemini REST API.
+
 Currently built for DE -> JP (German to Japanese) including automatic Masu -> Dictionary Form cards for verbs, but can theoretically be adapted for any language.
 
 ## Preview
 <table>
   <tr>
-    <td align="center"><b>Input (image.png)</b></td>
+    <td align="center"><b>Web Interface Input</b></td>
     <td align="center"><b>Result in Anki</b></td>
   </tr>
   <tr>
@@ -16,28 +18,23 @@ Currently built for DE -> JP (German to Japanese) including automatic Masu -> Di
 </table>
 
 ## How to use
-1. **Clone the repository:**
-
+1. **Clone the repository and switch branch:**
    ```bash
    git clone https://github.com/UTSGhost/AnkiGenerator
    cd AnkiGenerator
+   git checkout serverless-app
    ```
-2. **Install dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-3. **Set up your API Key:**
-Create a .env file in the root directory and add your Google Gemini API key:
-    ```env
-    GEMINI_API_KEY="your_api_key_here"
-    ```
-4. **Run the script:** Place your vocabulary image as image.png in the root folder and run:
-    ```bash
-    python main.py
-    ```
-The generated output.apkg can then be directly imported into Anki
+
+2. **Start a local development server:**
+   Because this project uses ES6 Modules and WebAssembly, you cannot just double-click the `index.html` (due to browser CORS restrictions). Start a simple local server instead:
+   * Using Python: `python -m http.server 5500`
+   * Or using VS Code: Install the "Live Server" extension and click "Go Live".
+
+3. **Generate Cards:**
+   Open the application in your browser (e.g., `[http://127.0.0.1:5500](http://127.0.0.1:5500)`). 
+   * Enter your Google Gemini API Key directly into the secure UI field (it remains in your browser and is never sent anywhere but Google).
+   * Upload your vocabulary image.
+   * The browser will process the AI response and download the generated `.apkg` file automatically.
 
 ## Credits & Sources
-
 Anki Theme / Formatting: Based on the awesome [HachiMoji Theme](https://ankiweb.net/shared/info/1367938531).
-
