@@ -1,7 +1,20 @@
 import * as z from "https://esm.sh/zod";
 
+const GEMINI_API_KEY = "API-KEY-HERE";
+
+const MODEL_ID_NORMAL = 1638294712
+const MODEL_ID_VERB = 1847201948
+const DECK_ID = 1482930491
+
+const front_html = await (await fetch("../flashcards/front.html")).text();
+const back_html = await (await fetch("../flashcards/back.html")).text();
+const css_code = await (await fetch("../flashcards/stylenormal.css")).text();
+const frontv_html = await (await fetch("../flashcards/frontverb.html")).text();
+const backv_html = await (await fetch("../flashcards/backverb.html")).text();
+const cssv_code = await (await fetch("../flashcards/stylev.css")).text();
+
 // zod schema for verification
-const Card = z.object({ 
+const ZodCard = z.object({ 
   translation: z.string(),
   details: z.string().optional(),
   masu: z.string().optional(),
@@ -10,14 +23,74 @@ const Card = z.object({
   dictionary: z.string().optional(),
 });
 
-const Deck = z.array(Card);
+const ZodDeck = z.array(ZodCard);
 
-// TODO
-const GEMINI_API_KEY = "API_KEY_HERE";
+// setup for genanki js
+const config = {
+    locateFile: filename => `js/sql/sql-wasm.wasm`
+}
 
-document.getElementById("upload-form").addEventListener("submit", displayLoad);
+let resolveSqlReady;
+const sqlReady = new Promise((resolve) => {
+    resolveSqlReady = resolve;
+});
 
-async function displayLoad(event){
+window.SQL = null;
+initSqlJs(config).then(function (sql) {
+    SQL = sql;
+    resolveSqlReady(); 
+});
+
+// schemas for genanki js
+const normal_vocabs = new Model({
+    name: "Normal Model",
+    id: MODEL_ID_NORMAL,
+    flds: [
+        { name: "Japanese" },
+        { name: "Translation" },
+        { name: "Translation Details" },
+        { name: "Information" }
+    ],
+    tmpls: [
+        {
+            name: "DE → JP",
+            qfmt: front_html,
+            afmt: back_html
+        }
+    ],
+    req: [
+        [0, "all", [0]]
+    ],
+    css: css_code
+});
+
+const verbs = new Model({
+    name: "Verb Model",
+    id: MODEL_ID_VERB,
+    flds: [
+        {name: 'Masu Form'},
+        {name: 'Dictionary Form'},
+        {name: 'Translation'},
+        {name: 'Translation Details'},
+        {name: 'Information'},
+    ],
+    tmpls: [
+        {
+            name: "Masu → Dictionary",
+            qfmt: frontv_html,
+            afmt: backv_html
+        }
+    ],
+    req: [
+        [0, "all", [0]]
+    ],
+    css: cssv_code
+});
+
+
+document.getElementById("upload-form").addEventListener("submit", uploadFile);
+
+async function uploadFile(event){
     // prevents POST request to flask directly
     event.preventDefault();
     // activate loader
@@ -29,37 +102,26 @@ async function displayLoad(event){
     const file = formData.get("file");
     
     try {
+        await sqlReady;
+
         const b64 = await fileTob64(file);
 
         const json = await fetchAi(b64, file.type);
-        
-        console.log(json);
+        console.log(json)
 
+        const validData = ZodDeck.parse(json);
+        console.log(validData)
 
-
-
-        /*
-        // create blob for download
-        const fileBlob = await response.blob();
-        const url = window.URL.createObjectURL(fileBlob);
-
-        // make temporary link for user to download file
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = "deck.apkg";
-        document.body.appendChild(a);
-        a.click();    
-        a.remove();
-        // free mem
-        window.URL.revokeObjectURL(url)*/
+        createDeck(validData);
+        console.log("Deck erfolgreich erstellt!", validData);
     } catch (error) {
         // display error
+        console.error("Error:", error);
         document.getElementById("error").innerHTML = error;
     } finally {
         document.getElementById("loader").style.display = "none";
     }
 }
-
 
 async function fileTob64(file){
     // so onloaded works with async await
@@ -91,7 +153,7 @@ async function fetchAi(b64, type){
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            model: "gemini-3.6-flash",
+            model: "gemini-3.5-flash-lite",
             input: [
                 {
                     type: "text", 
@@ -106,17 +168,35 @@ async function fetchAi(b64, type){
             response_format: { 
                 type: "text",
                 mime_type: "application/json",
-                schema: { // same as Zod schema
+                schema: {
                     type: "array",
                     items: {
                         type: "object",
                         properties: {
-                            translation: { type: "string" },
-                            details: { type: "string" },
-                            masu: { type: "string" },
-                            japanese: { type: "string" },
-                            information: { type: "string" },
-                            dictionary: { type: "string" }
+                            translation: { 
+                                type: "string", 
+                                description: "The German translation of the word." 
+                            },
+                            details: { 
+                                type: "string", 
+                                description: "Optional clarification only if the German word is ambiguous (e.g. to distinguish between different Japanese translations)." 
+                            },
+                            masu: { 
+                                type: "string", 
+                                description: "Masu-form if it is a Japanese verb; null otherwise." 
+                            },
+                            japanese: { 
+                                type: "string", 
+                                description: "The Japanese word" 
+                            },
+                            information: { 
+                                type: "string", 
+                                description: "Optional explanations or additions for the back side." 
+                            },
+                            dictionary: { 
+                                type: "string", 
+                                description: "Dictionary-form if it is a Japanese verb; null otherwise." 
+                            }
                         },
                         required: ["translation", "japanese"]
                     }
@@ -124,9 +204,34 @@ async function fetchAi(b64, type){
             }
         })
     });
+
     const json = await response.json();
-    // maybe not needed? else to unpack response to real JSON
-    const jsonString = data.output || data.candidates[0].content.parts[0].text;
+
+    if (!response.ok) {
+        console.error("GOOGLE API ERROR:", JSON.stringify(json, null, 2));
+        throw new Error(response.error?.message || "Unknown API-Errro");
+    }
+    // weird way because thats Gemini API with REST for you
+    let jsonString = null;
+    if (json.steps) {
+        for (const step of json.steps) {
+            if (step.content) {
+                for (const part of step.content) {
+                    if (part.text) {
+                        jsonString = part.text;
+                    }
+                }
+            }
+        }
+    }
+    // fallback
+    if (!jsonString) {
+        jsonString = json.output_text;
+    }
+    // still empty response
+    if (!jsonString) {
+        throw new Error("No API response");
+    }
     //return array
     return JSON.parse(jsonString);
 }
@@ -137,20 +242,31 @@ async function getPrompt() {
     return promptText;
 }
 
-config = {
-    locateFile: filename => `/js/sql/sql-wasm.wasm`
-}
 
-var SQL;
-initSqlJs(config).then(function (sql) {
-    //Create the database
-    SQL = sql;
-});
+function createDeck(cardsArray){
+    var deck = new Deck(DECK_ID, "Self Imported");
 
-function createDeck(json){
-    var deck = new Deck(1276438724672, "Self Imported");
+    cardsArray.forEach(card => {
 
-    json.array.forEach(card => {
-        
+        const safe = (val) => (val && val !== "null") ? String(val) : "";
+
+        const japanese = safe(card.japanese);
+        const translation = safe(card.translation);
+        const details = safe(card.details);
+        const information = safe(card.information);
+        const masu = safe(card.masu);
+        const dictionary = safe(card.dictionary);
+
+        if (!masu){
+            deck.addNote(normal_vocabs.note([japanese, translation, details, information]));
+        } else {
+            deck.addNote(normal_vocabs.note([japanese, translation, details, information]));
+            deck.addNote(verbs.note([masu, dictionary, translation, details, information]));
+        }
     });
+
+    var pkg = new Package();
+    pkg.addDeck(deck);
+
+    pkg.writeToFile('deck.apkg');
 }
