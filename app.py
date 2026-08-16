@@ -5,10 +5,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import genanki
-from flask import render_template, Flask, request, send_file, redirect, url_for, flash
-from markupsafe import escape
-from markupsafe import Markup
-from PIL import Image
+from flask import render_template, Flask, request, send_file
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = '.'
@@ -30,14 +27,12 @@ def hello_world(name=None):
 def upload_file():
     # no file
     if 'file' not in request.files:
-        flash('No file part')
-        return redirect(request.url)
+        return 'no file!', 400
     # from html form
     file = request.files['file']
     # empty file created by browser
     if file.filename == '':
-        flash('No selected file')
-        return redirect(request.url)
+        return 'no file!', 400
     
     if file and allowed_file(file.filename):
             filename = secure_filename(file.filename) # type: ignore
@@ -49,7 +44,7 @@ def upload_file():
             output_path = createDeck(json)
             # as attachment to download
             return send_file(output_path,as_attachment=True)
-    return "bad file"
+    return 'wrong fileformat!', 400
 
 
 
