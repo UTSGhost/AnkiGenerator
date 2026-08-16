@@ -58,6 +58,11 @@ interaction = client.interactions.create(
         "type": "text",
         "mime_type": "application/json",
         "schema": Deck.model_json_schema()
+    },
+    extra_body={
+        "generation_config": {
+            "temperature": 0.0
+        }
     }
 )
 
