@@ -1,10 +1,35 @@
 from google import genai
 import os
+import io
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import genanki
-import random
+from flask import render_template, Flask, request, send_file
+from markupsafe import escape
+from markupsafe import Markup
+from PIL import Image
+
+
+app = Flask(__name__)
+
+
+
+@app.route("/")
+def hello_world(name=None):
+    return render_template('index.html', person=name)
+
+
+@app.post("/")
+def posted():
+    print("post successful")
+    file = request.files['image']
+    img = Image.open(file)
+    img.verify()
+
+    return "yayaya"
+
+
 
 # put your Gemini API key into .env in root
 load_dotenv()
@@ -30,7 +55,7 @@ image = client.files.upload(file="image.png")
 with (
     open("templates/front.html", "r", encoding="utf-8") as f_front,
     open("templates/back.html", "r", encoding="utf-8") as f_back,
-    open("templates/style.css", "r", encoding="utf-8") as f_css,
+    open("templates/stylenormal.css", "r", encoding="utf-8") as f_css,
     open("templates/frontverb.html", "r", encoding="utf-8") as f_frontv,
     open("templates/backverb.html", "r", encoding="utf-8") as f_backv,
     open("templates/stylev.css", "r", encoding="utf-8") as f_cssv,
@@ -45,107 +70,108 @@ with (
     prompt = f_prompt.read()
 
 #send data to AI
-interaction = client.interactions.create(
-    model="gemini-3.7-flash",
-    input=[
-        {"type": "text", "text": prompt},
-        {
-            "type": "image",
-            "uri": image.uri,
-            "mime_type": image.mime_type
+def requestJson():
+    interaction = client.interactions.create(
+        model="gemini-3.1-flash",
+        input=[
+            {"type": "text", "text": prompt},
+            {
+                "type": "image",
+                "uri": image.uri,
+                "mime_type": image.mime_type
+            }
+        ],
+        response_format={
+            "type": "text",
+            "mime_type": "application/json",
+            "schema": Deck.model_json_schema()
         }
-    ],
-    response_format={
-        "type": "text",
-        "mime_type": "application/json",
-        "schema": Deck.model_json_schema()
-    }
-)
+    )
 
-# should never be raised, but safer to check
-if not (interaction.output_text): # type: ignore
-    raise ValueError("no output text")
+    # should never be raised, but safer to check
+    if not (interaction.output_text): # type: ignore
+        raise ValueError("no output text")
 
+def createDeck():
+    deck = Deck.model_validate_json(interaction.output_text) # type: ignore
+    # for debugging
+    print(deck)
 
-deck = Deck.model_validate_json(interaction.output_text) # type: ignore
-# for debugging
-print(deck)
+    # necessary for genanki model -> https://darigovresearch.github.io/genanki/build/html/overview.html
+    MODEL_ID_NORMAL = 1638294712
+    MODEL_ID_VERB = 1847201948
+    DECK_ID = 1482930491
 
-# necessary for genanki model -> https://darigovresearch.github.io/genanki/build/html/overview.html
-MODEL_ID_NORMAL = 1638294712
-MODEL_ID_VERB = 1847201948
-DECK_ID = 1482930491
+    # Anki Card Model for most vocabs
+    normal_vocabs = genanki.Model(
+        MODEL_ID_NORMAL,
+        'Normal Model',
+        fields=[
+            {'name': 'Japanese'},
+            {'name': 'Translation'},
+            {'name': 'Translation Details'},
+            {'name': 'Information'},
+        ],
+        templates=[
+            {
+            'name': 'DE → JP',
+            'qfmt': front_html,
+            'afmt': back_html,
+            },
+        ],
+        css=css_code
+    )
 
-# Anki Card Model for most vocabs
-normal_vocabs = genanki.Model(
-    MODEL_ID_NORMAL,
-    'Normal Model',
-    fields=[
-        {'name': 'Japanese'},
-        {'name': 'Translation'},
-        {'name': 'Translation Details'},
-        {'name': 'Information'},
-    ],
-    templates=[
-        {
-        'name': 'DE → JP',
-        'qfmt': front_html,
-        'afmt': back_html,
-        },
-    ],
-    css=css_code
-)
+    # Anki Card Model for Masu -> Dictionary form
+    verbs = genanki.Model(
+        MODEL_ID_VERB,
+        'Verb Model',
+        fields=[
+            {'name': 'Masu Form'},
+            {'name': 'Dictionary Form'},
+            {'name': 'Translation'},
+            {'name': 'Translation Details'},
+            {'name': 'Information'},
+        ],
+        templates=[
+            {
+            'name': 'Masu → Dictionary',
+            'qfmt': frontv_html,
+            'afmt': backv_html,
+            },
+        ],
+        css=cssv_code
+    )
 
-# Anki Card Model for Masu -> Dictionary form
-verbs = genanki.Model(
-    MODEL_ID_VERB,
-    'Verb Model',
-    fields=[
-        {'name': 'Masu Form'},
-        {'name': 'Dictionary Form'},
-        {'name': 'Translation'},
-        {'name': 'Translation Details'},
-        {'name': 'Information'},
-    ],
-    templates=[
-        {
-        'name': 'Masu → Dictionary',
-        'qfmt': frontv_html,
-        'afmt': backv_html,
-        },
-    ],
-    css=cssv_code
-)
+    # Necessary to output as a file
+    my_deck = genanki.Deck(
+        DECK_ID,
+        'Self Imported'
+    )
 
-# Necessary to output as a file
-my_deck = genanki.Deck(
-    DECK_ID,
-    'Self Imported'
-)
-
-# go through all cards from AI output to create cards and add them to the deck
-for card in deck.cards:
-    # for verbs, create 2 different types of cards and add both to deck
-    if (card.masu):
-        my_note_masu = genanki.Note(
-                model=verbs,
-                fields=[card.masu, card.dictionary or "", card.translation, card.details or "", card.information or ""]
+    # go through all cards from AI output to create cards and add them to the deck
+    for card in deck.cards:
+        # for verbs, create 2 different types of cards and add both to deck
+        if (card.masu):
+            my_note_masu = genanki.Note(
+                    model=verbs,
+                    fields=[card.masu, card.dictionary or "", card.translation, card.details or "", card.information or ""]
+                )
+            my_note = genanki.Note(
+                        model=normal_vocabs,
+                        fields=[card.japanese, card.translation, card.details or "", card.information or ""]
+                )
+            my_deck.add_note(my_note_masu)
+            my_deck.add_note(my_note)
+        # for normal verbs, only add the standard card
+        else:
+            my_note = genanki.Note(
+                model=normal_vocabs,
+                fields=[card.japanese, card.translation, card.details or "", card.information or ""]
             )
-        my_note = genanki.Note(
-                    model=normal_vocabs,
-                    fields=[card.japanese, card.translation, card.details or "", card.information or ""]
-            )
-        my_deck.add_note(my_note_masu)
-        my_deck.add_note(my_note)
-    # for normal verbs, only add the standard card
-    else:
-        my_note = genanki.Note(
-            model=normal_vocabs,
-            fields=[card.japanese, card.translation, card.details or "", card.information or ""]
-        )
-        my_deck.add_note(my_note)
-    
-# output can be directly inported to Anki
-genanki.Package(my_deck).write_to_file('output.apkg')
+            my_deck.add_note(my_note)
+        
+    # output can be directly inported to Anki
+    genanki.Package(my_deck).write_to_file('output.apkg')
 
 
