@@ -1,4 +1,4 @@
-# AI-Image-to-Anki (Serverless / Client-Side Version)
+# AI-Image-to-Anki (JAMstack / Client-Side Version)
 
 Create anki decks based on Images, using Gemini API and `genanki-js`. 
 **This branch features a 100% Serverless Architecture.** The app runs entirely in your browser using JavaScript, WebAssembly (`sql.js`), and `zod` for AI response validation. No backend or Python required! It communicates directly with the Gemini REST API.
