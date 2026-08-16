@@ -5,29 +5,48 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import genanki
-from flask import render_template, Flask, request, send_file
+from flask import render_template, Flask, request, send_file, redirect, url_for, flash
 from markupsafe import escape
 from markupsafe import Markup
 from PIL import Image
+from werkzeug.utils import secure_filename
 
+UPLOAD_FOLDER = '.'
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
+app.secret_key = "randompassword"
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route("/")
 def hello_world(name=None):
     return render_template('index.html', person=name)
 
-
 @app.post("/")
-def posted():
-    print("post successful")
-    file = request.files['image']
-    img = Image.open(file)
-    img.verify()
-
-    return "yayaya"
+def upload_file():
+    # no file
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+    # from html form
+    file = request.files['file']
+    # empty file created by browser
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(request.url)
+    
+    if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename) # type: ignore
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            json = requestJson(filepath)
+            output_path = createDeck(json)
+            return send_file(output_path,as_attachment=True)
+    return "bad file"
 
 
 
@@ -50,7 +69,6 @@ class Deck(BaseModel):
     cards: List[Card]
 
 client = genai.Client()
-image = client.files.upload(file="image.png")
 
 with (
     open("templates/front.html", "r", encoding="utf-8") as f_front,
@@ -70,15 +88,17 @@ with (
     prompt = f_prompt.read()
 
 #send data to AI
-def requestJson():
+def requestJson(filepath):
+    gemini_input_file = client.files.upload(file=filepath)
+
     interaction = client.interactions.create(
-        model="gemini-3.1-flash",
+        model="gemini-3.6-flash",
         input=[
             {"type": "text", "text": prompt},
             {
                 "type": "image",
-                "uri": image.uri,
-                "mime_type": image.mime_type
+                "uri": gemini_input_file.uri,
+                "mime_type": gemini_input_file.mime_type
             }
         ],
         response_format={
@@ -91,9 +111,11 @@ def requestJson():
     # should never be raised, but safer to check
     if not (interaction.output_text): # type: ignore
         raise ValueError("no output text")
+    return interaction.output_text # type: ignore
 
-def createDeck():
-    deck = Deck.model_validate_json(interaction.output_text) # type: ignore
+
+def createDeck(json):
+    deck = Deck.model_validate_json(json)
     # for debugging
     print(deck)
 
@@ -172,6 +194,8 @@ def createDeck():
             my_deck.add_note(my_note)
         
     # output can be directly inported to Anki
-    genanki.Package(my_deck).write_to_file('output.apkg')
+    output_path = 'output.apkg'
+    genanki.Package(my_deck).write_to_file(output_path)
+    return output_path
 
 
