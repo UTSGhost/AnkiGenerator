@@ -7,9 +7,12 @@
       <title>Anki Generator</title>
   </head>
   <body>
-    input file:
+    
     <form id="upload-form" method="POST" enctype="multipart/form-data">
+      input file:
       <input type="file" name="file">
+      API key:
+      <input type="text" name="key">
       <button type="submit">upload</button>
     </form>
     <div id="loader">Loading...</div>

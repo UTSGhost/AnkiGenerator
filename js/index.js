@@ -1,6 +1,6 @@
 import * as z from "https://esm.sh/zod";
 
-const GEMINI_API_KEY = "APIKEYHERE";
+let GEMINI_API_KEY = "APIKEYHERE";
 const GEMINI_MODEL = "gemini-3.7-flash"; //change to your preferred model
 
 const MODEL_ID_NORMAL = 1638294712
@@ -101,6 +101,7 @@ async function uploadFile(event){
     // formData is the form element
     const formData = new FormData(event.target);
     const file = formData.get("file");
+    GEMINI_API_KEY = formData.get("key");
     
     try {
         await sqlReady;
