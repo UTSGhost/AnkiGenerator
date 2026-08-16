@@ -1,6 +1,6 @@
 # AI-Image-to-Anki
 
-*Check out my other 2 branches as well: [Serverless](https://github.com/UTSGhost/AnkiGenerator/tree/serverless-app) | [Full-Stack Webserver](https://github.com/UTSGhost/AnkiGenerator/tree/web-app)*
+*Check out my other 2 branches as well: [JAMstack App](https://github.com/UTSGhost/AnkiGenerator/tree/serverless-app) | [Full-Stack Webserver](https://github.com/UTSGhost/AnkiGenerator/tree/web-app)*
 
 Create anki decks based on Images, using Gemini API and `genanki`. 
 Currently built for DE -> JP (German to Japanese) including automatic Masu -> Dictionary Form cards for verbs, but can theoretically be adapted for any language.
