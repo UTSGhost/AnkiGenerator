@@ -1,4 +1,5 @@
 .env
 output.apkg
-image.png
+*.png
+*.jpeg
 __pycache__
