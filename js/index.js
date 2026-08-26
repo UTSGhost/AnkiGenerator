@@ -1,7 +1,7 @@
 import * as z from "https://esm.sh/zod";
 
 let GEMINI_API_KEY = "APIKEYHERE";
-const GEMINI_MODEL = "gemini-3.7-flash"; //change to your preferred model
+const GEMINI_MODEL = "gemini-3.1-flash-lite"; //change to your preferred model
 
 const MODEL_ID_NORMAL = 1638294712
 const MODEL_ID_VERB = 1847201948
@@ -106,7 +106,26 @@ async function uploadFile(event){
     try {
         await sqlReady;
         const b64 = await fileTob64(file);
-        const json = await fetchAi(b64, file.type);
+        let json = await fetchAi(b64, file.type);
+        json.push({
+    japanese: "食べる",
+    translation: "essen",
+    dictionary: "食べる",
+    masu: "" 
+});
+        console.log("First JSON content:", json);
+        // if dict is empty
+        const {badCards, goodCards} = checkForAiError(json);
+        if(badCards.length > 0){
+            let fixedCards = await fixAiCards(badCards);
+            json = goodCards.concat(fixedCards);
+            console.log("--- DEBUGGING INFO ---");
+            console.log("Amount Good Cards:", goodCards.length);
+            console.log("Amount Bad Cards:", badCards.length);
+            console.log("Final JSON Array Length:", json.length);
+            console.log("Content Corrected Cards:", fixedCards);
+            console.log("Content Final Cards:", json);
+        }
         const validData = ZodDeck.parse(json);
         createDeck(validData);
     } catch (error) {
@@ -245,6 +264,116 @@ async function getPrompt() {
     const response = await fetch('prompt.txt');
     const promptText = await response.text();
     return promptText;
+}
+
+function checkForAiError(json){
+    let response = {
+        badCards: [],
+        goodCards: []
+    }
+
+    json.forEach(card => {
+        if((card.masu || card.dictionary) && !(card.masu && card.dictionary && card.japanese)){
+            // if its a verb but one of the three fields is missing
+            response.badCards.push(card);
+        } else {
+            response.goodCards.push(card)
+        }
+    });
+    return response;
+}
+
+async function fixAiCards(badCards){
+    // send request to Gemini API via REST
+    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
+        method: "POST",
+        headers: {
+            "x-goog-api-key": GEMINI_API_KEY,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            model: GEMINI_MODEL,
+            input: [
+                {
+                    type: "text", 
+                    text:   "You are an expert Japanese linguist and data processor. Your task is to fix the missing or incorrect verb conjugations in the provided JSON array of flashcards. Apply the following strict rules to EVERY card:\n" +
+                            "1. 'japanese' and 'masu' MUST both contain the exact same Japanese Masu-form of the verb (e.g., 食べます).\n" +
+                            "2. 'dictionary' MUST contain the Japanese Dictionary-form of the verb (e.g., 食べる).\n" +
+                            "3. 'translation': Keep the existing German translation verbatim unless it is objectively incorrect.\n" +
+                            "4. 'details' and 'information': DO NOT modify these fields under any circumstances. Copy them exactly as provided.\n" +
+                            "JSON data: " + JSON.stringify(badCards)
+                }
+            ],
+            response_format: { 
+                type: "text",
+                mime_type: "application/json",
+                schema: {
+                    type: "array",
+                    items: {
+                        type: "object",
+                        properties: {
+                            translation: { 
+                                type: "string", 
+                                description: "The German translation of the word." 
+                            },
+                            details: { 
+                                type: "string", 
+                                description: "Optional clarification only if the German word is ambiguous (e.g. to distinguish between different Japanese translations)." 
+                            },
+                            masu: { 
+                                type: "string", 
+                                description: "Masu-form if it is a Japanese verb; null otherwise." 
+                            },
+                            japanese: { 
+                                type: "string", 
+                                description: "The Japanese word" 
+                            },
+                            information: { 
+                                type: "string", 
+                                description: "Optional explanations or additions for the back side." 
+                            },
+                            dictionary: { 
+                                type: "string", 
+                                description: "Dictionary-form if it is a Japanese verb; null otherwise." 
+                            }
+                        },
+                        required: ["translation", "japanese"]
+                    }
+                }
+            },
+            generation_config: {
+                temperature: 0
+            }
+        })
+    });
+    const json = await response.json();
+    // some API error
+    if (!response.ok) {
+        console.error("GOOGLE API ERROR ON SECOND CALL:", JSON.stringify(json, null, 2));
+        throw new Error(response.error?.message || "Unknown API-Error on second call");
+    }
+    // weird way to extract important data from response because nothing else works
+    let jsonString = null;
+    if (json.steps) {
+        for (const step of json.steps) {
+            if (step.content) {
+                for (const part of step.content) {
+                    if (part.text) {
+                        jsonString = part.text;
+                    }
+                }
+            }
+        }
+    }
+    // fallback
+    if (!jsonString) {
+        jsonString = json.output_text;
+    }
+    // empty response
+    if (!jsonString) {
+        throw new Error("No API response on second call");
+    }
+    return JSON.parse(jsonString);
 }
 
 
