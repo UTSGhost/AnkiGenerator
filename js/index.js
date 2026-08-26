@@ -107,12 +107,7 @@ async function uploadFile(event){
         await sqlReady;
         const b64 = await fileTob64(file);
         let json = await fetchAi(b64, file.type);
-        json.push({
-    japanese: "食べる",
-    translation: "essen",
-    dictionary: "食べる",
-    masu: "" 
-});
+        
         console.log("First JSON content:", json);
         // if dict is empty
         const {badCards, goodCards} = checkForAiError(json);
