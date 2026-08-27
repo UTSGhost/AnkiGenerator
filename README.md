@@ -29,8 +29,8 @@ If you have Docker Desktop installed, you can run the [Full-stack Webserver bran
     ```bash
     docker run -p 5000:5000 utsghost/anki-webapp:latest
     ```
-2. Open `http://localhost:5000` in your browser.
-
+2. **Generate Cards:**
+   Open your browser and navigate to `http://127.0.0.1:5000`. Upload your vocabulary image and API key via the web interface and wait for the `.apkg` file to download automatically.
 
 ### Option 2: If you want to hack the code locally
 1. **Clone the repository:**
@@ -52,7 +52,7 @@ Create a .env file in the root directory and add your Google Gemini API key:
     ```bash
     python main.py
     ```
-The generated output.apkg can then be directly imported into Anki
+The generated output.apkg can then be directly imported into Anki.
 
 ## Credits & Sources
 
