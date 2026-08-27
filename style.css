@@ -1,3 +1,17 @@
+:root {
+    --highlight-color: #5352ed;
+    --background-medium: #070708;
+    --background-dark: #000000;
+    --text-color: #fff;
+}
+
+html {
+    background-color: var(--background-medium);
+    color: var(--text-color);
+    font-family: 'Nunito', sans-serif;
+}
+
+
 #loader {
     display: none;
 }
