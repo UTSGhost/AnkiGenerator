@@ -46,12 +46,12 @@ If you have Docker Desktop installed, you don't need to clone the repo or instal
    pip install -r requirements.txt
    ```
 
-4. **Start the Web Server:** 
+3. **Start the Web Server:** 
    ```bash
    python -m flask run
    ```
 
-5. **Generate Cards:**
+4. **Generate Cards:**
    Open your browser and navigate to `http://127.0.0.1:5000`. Upload your vocabulary image and API key via the web interface and wait for the `.apkg` file to download automatically.
 
 ## Credits & Sources
