@@ -61,7 +61,7 @@ function App() {
         <div className={`theme-wrapper ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
             <Header isDarkMode={isDarkMode} onToggle={toggleTheme} />
             Anki Generator
-            <form id="upload-form" onSubmit={handleUpload} encType="multipart/form-data">
+            <form id="upload-form" onSubmit={handleUpload}>
             Input file:
             <input type="file" name="file" />
             API key:
