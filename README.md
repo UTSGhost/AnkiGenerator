@@ -19,7 +19,8 @@ Currently built for DE -> JP (German to Japanese) including automatic Masu -> Di
 
 ## How to use
 
-You have to ways to run this app:
+You can visit [my site](https://anki.utsghost.dev/) to try out the [JAMstack branch](https://github.com/UTSGhost/AnkiGenerator/tree/serverless-app).
+Alternatively, use one of the two options to test it locally:
 
 ### Option 1: Using Docker (Recommended)
 
