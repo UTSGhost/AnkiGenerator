@@ -25,6 +25,7 @@ You have to ways to run this app:
 
 If you have Docker Desktop installed, you can run the [Full-stack Webserver branch](https://github.com/UTSGhost/AnkiGenerator/tree/web-app):
 1. **Run:**
+
     ```bash
     docker run -p 5000:5000 utsghost/anki-webapp:latest
     ```
