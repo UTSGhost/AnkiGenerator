@@ -1,15 +1,17 @@
 {
   "name": "serverless-app",
   "version": "1.0.0",
-  "description": "Create anki decks based on Images, using Gemini API and `genanki-js`. \r **This branch features a 100% Serverless Architecture.** The app runs entirely in your browser using JavaScript, WebAssembly (`sql.js`), and `zod` for AI response validation. No backend or Python required! It communicates directly with the Gemini REST API.",
-  "main": "index.js",
+  "description": "Create anki decks...",
+  "type": "module", 
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
+  
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

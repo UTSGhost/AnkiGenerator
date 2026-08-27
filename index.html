@@ -1,23 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="stylesheet" href="style.css" type="text/css">
-      <title>Anki Generator</title>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Anki Generator</title>
   </head>
   <body>
-    
-    <form id="upload-form" method="POST" enctype="multipart/form-data">
-      input file:
-      <input type="file" name="file">
-      API key:
-      <input type="text" name="key">
-      <button type="submit">upload</button>
-    </form>
-    <div id="loader">Loading...</div>
-    <div id="error"></div>
-
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
     <script src='js/anki/genanki.js'></script>
       <!-- sqlite -->
     <script src='js/sql/sql.js'></script>
@@ -27,6 +18,5 @@
 
     <!-- jszip for .apkg -->
     <script src="js/jszip.min.js"></script>
-    <script type="module" src="js/index.js"></script>
   </body>
 </html>

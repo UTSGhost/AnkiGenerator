@@ -1,4 +1,4 @@
-import * as z from "https://esm.sh/zod";
+import * as z from "zod";
 
 let GEMINI_API_KEY = "APIKEYHERE";
 const GEMINI_MODEL = "gemini-3.1-flash-lite"; //change to your preferred model
@@ -7,12 +7,13 @@ const MODEL_ID_NORMAL = 1638294712
 const MODEL_ID_VERB = 1847201948
 const DECK_ID = 1482930491
 
-const front_html = await (await fetch("../flashcards/front.html")).text();
-const back_html = await (await fetch("../flashcards/back.html")).text();
-const css_code = await (await fetch("../flashcards/stylenormal.css")).text();
-const frontv_html = await (await fetch("../flashcards/frontverb.html")).text();
-const backv_html = await (await fetch("../flashcards/backverb.html")).text();
-const cssv_code = await (await fetch("../flashcards/stylev.css")).text();
+import front_html from "./flashcards/front.html?raw";
+import back_html from "./flashcards/back.html?raw";
+import css_code from "./flashcards/stylenormal.css?raw";
+import frontv_html from "./flashcards/frontverb.html?raw";
+import backv_html from "./flashcards/backverb.html?raw";
+import cssv_code from "./flashcards/stylev.css?raw";
+import promptText from "./prompt.txt?raw";
 
 // zod schema for verification
 const ZodCard = z.object({ 
@@ -27,20 +28,11 @@ const ZodCard = z.object({
 const ZodDeck = z.array(ZodCard);
 
 // setup for genanki js
-const config = {
-    locateFile: filename => `/js/sql/sql-wasm.wasm`
-}
-
-let resolveSqlReady;
-const sqlReady = new Promise((resolve) => {
-    resolveSqlReady = resolve;
-});
-
 window.SQL = null;
-initSqlJs(config).then(function (sql) {
-    SQL = sql;
-    resolveSqlReady(); 
-});
+export function initSql() {
+    return initSqlJs({ locateFile: filename => `/js/sql/sql-wasm.wasm` })
+        .then(sql => { window.SQL = sql; });
+}
 
 // schemas for genanki js
 const normal_vocabs = new Model({
@@ -88,51 +80,7 @@ const verbs = new Model({
     css: cssv_code
 });
 
-
-document.getElementById("upload-form").addEventListener("submit", uploadFile);
-
-async function uploadFile(event){
-    // prevents POST request to flask directly
-    event.preventDefault();
-    // activate loader
-    document.getElementById("loader").style.display = "block";
-    // delete any previous error messages
-    document.getElementById("error").innerHTML = "";
-    // formData is the form element
-    const formData = new FormData(event.target);
-    const file = formData.get("file");
-    GEMINI_API_KEY = formData.get("key");
-    
-    try {
-        await sqlReady;
-        const b64 = await fileTob64(file);
-        let json = await fetchAi(b64, file.type);
-        
-        console.log("First JSON content:", json);
-        // if dict is empty
-        const {badCards, goodCards} = checkForAiError(json);
-        if(badCards.length > 0){
-            let fixedCards = await fixAiCards(badCards);
-            json = goodCards.concat(fixedCards);
-            console.log("--- DEBUGGING INFO ---");
-            console.log("Amount Good Cards:", goodCards.length);
-            console.log("Amount Bad Cards:", badCards.length);
-            console.log("Final JSON Array Length:", json.length);
-            console.log("Content Corrected Cards:", fixedCards);
-            console.log("Content Final Cards:", json);
-        }
-        const validData = ZodDeck.parse(json);
-        createDeck(validData);
-    } catch (error) {
-        // display error
-        console.error("Error:", error);
-        document.getElementById("error").innerHTML = error;
-    } finally {
-        document.getElementById("loader").style.display = "none";
-    }
-}
-
-async function fileTob64(file){
+export async function fileTob64(file){
     // so onloaded works with async await
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -162,12 +110,12 @@ async function fileTob64(file){
  * @returns {Promise<Array<Object>>} A promise that resolves to an array of structured Anki card objects.
  * @throws {Error} Throws an error if the API cannot be reached or the response is empty.
  */
-async function fetchAi(b64, type){
+export async function fetchAi(b64, type, apiKey){
     // send request to Gemini API via REST
     const response = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
         method: "POST",
         headers: {
-            "x-goog-api-key": GEMINI_API_KEY,
+            "x-goog-api-key": apiKey,
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -175,7 +123,7 @@ async function fetchAi(b64, type){
             input: [
                 {
                     type: "text", 
-                    text: await getPrompt()
+                    text: promptText
                 },
                 {
                     type: "image",
@@ -255,13 +203,7 @@ async function fetchAi(b64, type){
     return JSON.parse(jsonString);
 }
 
-async function getPrompt() {
-    const response = await fetch('prompt.txt');
-    const promptText = await response.text();
-    return promptText;
-}
-
-function checkForAiError(json){
+export function checkForAiError(json){
     let response = {
         badCards: [],
         goodCards: []
@@ -278,12 +220,12 @@ function checkForAiError(json){
     return response;
 }
 
-async function fixAiCards(badCards){
+export async function fixAiCards(badCards, apiKey){
     // send request to Gemini API via REST
     const response = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
         method: "POST",
         headers: {
-            "x-goog-api-key": GEMINI_API_KEY,
+            "x-goog-api-key": apiKey,
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -372,10 +314,11 @@ async function fixAiCards(badCards){
 }
 
 
-function createDeck(cardsArray){
+export function createDeck(cardsArray){
     var deck = new Deck(DECK_ID, "Self Imported");
+    const validData = ZodDeck.parse(cardsArray);
 
-    cardsArray.forEach(card => {
+    validData.forEach(card => {
 
         const safe = (val) => (val && val !== "null") ? String(val) : "";
 
