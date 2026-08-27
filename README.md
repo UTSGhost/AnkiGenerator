@@ -36,5 +36,7 @@ Currently built for DE -> JP (German to Japanese) including automatic Masu -> Di
    * Upload your vocabulary image.
    * The browser will process the AI response and download the generated `.apkg` file automatically.
 
+The generated output.apkg can then be directly imported into Anki.
+
 ## Credits & Sources
 Anki Theme / Formatting: Based on the awesome [HachiMoji Theme](https://ankiweb.net/shared/info/1367938531).
