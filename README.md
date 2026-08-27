@@ -18,6 +18,22 @@ Currently built for DE -> JP (German to Japanese) including automatic Masu -> Di
 </table>
 
 ## How to use
+
+You have to ways to run this app:
+
+### Option 1: Using Docker (Recommended)
+
+If you have Docker Desktop installed, you don't need to clone the repo or install any dependencies.
+
+1. **Run:**
+
+    ```bash
+    docker run -p 5000:5000 utsghost/anki-webapp:latest
+    ```
+2. Open `http://localhost:5000` in your browser.
+
+### Option 2: If you want to hack the code locally
+
 1. **Clone the repository and switch branch:**
    ```bash
    git clone https://github.com/UTSGhost/AnkiGenerator
