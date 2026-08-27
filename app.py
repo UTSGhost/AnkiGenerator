@@ -4,56 +4,13 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from typing import List, Optional
 import genanki
-from flask import render_template, Flask, request, send_file
+from flask import render_template, Flask, request, send_file, after_this_request
 from werkzeug.utils import secure_filename
+import io
 
 UPLOAD_FOLDER = '.'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 GEMINI_MODEL = "gemini-3.1-flash-lite"
-
-app = Flask(__name__)
-app.secret_key = "randompassword"
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-@app.route("/")
-def hello_world(name=None):
-    return render_template('index.html', person=name)
-
-@app.post("/")
-def upload_file():
-    # from html form
-    file = request.files.get('file')
-    api_key = request.form.get('key')
-    # bad or missing input
-    if not file:
-        return 'no file!', 400
-    if file.filename == '':
-        return 'no file!', 400
-    if not api_key:
-        return 'no api_key', 400
-
-    client = genai.Client(api_key=api_key)
-    
-    if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename) # type: ignore
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)
-            # AI request
-            deck = fetchAi(filepath, client)
-            # self healing
-            goodCards, badCards = checkForError(deck)
-            if badCards:
-                fixedCards = fixVerbAi(badCards, client)
-                deck = Deck(cards = (fixedCards.cards + goodCards))
-            # genanki deck generation
-            output_path = createDeck(deck)
-            # as attachment to download
-            return send_file(output_path,as_attachment=True)
-    return 'wrong fileformat!', 400
 
 class Card(BaseModel):
     translation: str = Field(description="The German translation of the word.")
@@ -82,6 +39,68 @@ with (
     backv_html = f_backv.read()
     cssv_code = f_cssv.read()
     prompt = f_prompt.read()
+
+app = Flask(__name__)
+app.secret_key = "randompassword"
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route("/")
+def hello_world(name=None):
+    return render_template('index.html', person=name)
+
+# entry point for programm
+@app.post("/")
+def upload_file():
+    # from html form
+    file = request.files.get('file')
+    api_key = request.form.get('key')
+    # bad or missing input
+    if not file:
+        return 'no file', 400
+    if file.filename == '':
+        return 'no file', 400
+    if not api_key:
+        return 'no api_key', 400
+
+    # AI model
+    client = genai.Client(api_key=api_key)
+    
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename) # type: ignore
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        try:
+            # AI request
+            deck = fetchAi(filepath, client)
+            # self healing
+            goodCards, badCards = checkForError(deck)
+            if badCards:
+                fixedCards = fixVerbAi(badCards, client)
+                deck = Deck(cards = (fixedCards.cards + goodCards))
+            # genanki deck generation
+            output_path = createDeck(deck)
+            # opens the file as binary
+            with open(output_path, 'rb') as f:
+                # load in RAM
+                return_data = io.BytesIO(f.read())
+            # delete output file. sendfile uses return_Data in RAM
+            os.remove(output_path)
+            return_data.name = 'output.apkg'
+            # as attachment to download
+            return send_file(return_data,as_attachment=True,download_name="output.apkg")
+        finally:
+            # delete image file
+            if os.path.exists(filepath):
+                try:
+                    print(filepath)
+                    os.remove(filepath)
+                except Exception as e:
+                    print(f"Error while trying to remove image: {e}")
+    return 'Forbidden file format', 400
 
 #send data to AI
 def fetchAi(filepath, client):
