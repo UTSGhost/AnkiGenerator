@@ -18,6 +18,20 @@ Currently built for DE -> JP (German to Japanese) including automatic Masu -> Di
 </table>
 
 ## How to use
+
+You have to ways to run this app:
+
+### Option 1: Using Docker (Recommended)
+
+If you have Docker Desktop installed, you can run the [Full-stack Webserver branch](https://github.com/UTSGhost/AnkiGenerator/tree/web-app):
+1. **Run:**
+    ```bash
+    docker run -p 5000:5000 utsghost/anki-webapp:latest
+    ```
+2. Open `http://localhost:5000` in your browser.
+
+
+### Option 2: If you want to hack the code locally
 1. **Clone the repository:**
 
    ```bash
@@ -33,7 +47,7 @@ Create a .env file in the root directory and add your Google Gemini API key:
     ```env
     GEMINI_API_KEY="your_api_key_here"
     ```
-4. **Run the script:** Place your vocabulary image as image.png in the root folder and run:
+4. **Run the script:** Place the image file in your root folder and run:
     ```bash
     python main.py
     ```

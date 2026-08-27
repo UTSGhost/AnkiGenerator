@@ -140,8 +140,6 @@ def fetchAi(image):
     # should never be raised, but safer to check
     if not (interaction.output_text): # type: ignore
         raise ValueError("no output text")
-
-
     return Deck.model_validate_json(interaction.output_text) # type: ignore
 
 def checkForError(deck):
@@ -156,35 +154,35 @@ def checkForError(deck):
 
 def fixVerbAi(badCards):
     #send data to AI
-        interaction = client.interactions.create(
-            model = GEMINI_MODEL,
-            input = [{
-                "type": "text", 
-                "text": "You are an expert Japanese linguist and data processor. Your task is to fix the missing or incorrect verb conjugations in the provided JSON array of flashcards. Apply the following strict rules to EVERY card:\n" +
-                        "1. 'japanese' and 'masu' MUST both contain the exact same Japanese Masu-form of the verb (e.g., 食べます).\n" +
-                        "2. 'dictionary' MUST contain the Japanese Dictionary-form of the verb (e.g., 食べる).\n" +
-                        "3. 'translation': Keep the existing German translation verbatim unless it is objectively incorrect.\n" +
-                        "4. 'details' and 'information': DO NOT modify these fields under any circumstances. Copy them exactly as provided.\n" +
-                        "JSON data: " + Deck(cards=badCards).model_dump_json() # create json text for LLM
-            }],
-            response_format={
-                "type": "text",
-                "mime_type": "application/json",
-                "schema": Deck.model_json_schema()
-            },
-            extra_body={
-                "generation_config": {
-                    "temperature": 0.0
-                }
+    interaction = client.interactions.create(
+        model = GEMINI_MODEL,
+        input = [{
+            "type": "text", 
+            "text": "You are an expert Japanese linguist and data processor. Your task is to fix the missing or incorrect verb conjugations in the provided JSON array of flashcards. Apply the following strict rules to EVERY card:\n" +
+                    "1. 'japanese' and 'masu' MUST both contain the exact same Japanese Masu-form of the verb (e.g., 食べます).\n" +
+                    "2. 'dictionary' MUST contain the Japanese Dictionary-form of the verb (e.g., 食べる).\n" +
+                    "3. 'translation': Keep the existing German translation verbatim unless it is objectively incorrect.\n" +
+                    "4. 'details' and 'information': DO NOT modify these fields under any circumstances. Copy them exactly as provided.\n" +
+                    "JSON data: " + Deck(cards=badCards).model_dump_json() # create json text for LLM
+        }],
+        response_format={
+            "type": "text",
+            "mime_type": "application/json",
+            "schema": Deck.model_json_schema()
+        },
+        extra_body={
+            "generation_config": {
+                "temperature": 0.0
             }
-        )
-    
-        # should never be raised, but safer to check
-        if not (interaction.output_text): # type: ignore
-            raise ValueError("no output text")
-    
-    
-        return Deck.model_validate_json(interaction.output_text) # type: ignore
+        }
+    )
+
+    # should never be raised, but safer to check
+    if not (interaction.output_text): # type: ignore
+        raise ValueError("no output text")
+
+
+    return Deck.model_validate_json(interaction.output_text) # type: ignore
 
 def createDeck(deck):
     # go through all cards from AI output to create cards and add them to the deck
