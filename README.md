@@ -54,5 +54,7 @@ If you have Docker Desktop installed, you don't need to clone the repo or instal
 4. **Generate Cards:**
    Open your browser and navigate to `http://127.0.0.1:5000`. Upload your vocabulary image and API key via the web interface and wait for the `.apkg` file to download automatically.
 
+The generated output.apkg can then be directly imported into Anki.
+
 ## Credits & Sources
 Anki Theme / Formatting: Based on the awesome [HachiMoji Theme](https://ankiweb.net/shared/info/1367938531).
