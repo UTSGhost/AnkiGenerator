@@ -68,6 +68,16 @@
 .input-describtion {
     margin-bottom: 6px;
 }
+
+.success {
+    color: var(--success)
+}
+.response-div {
+    display: flex;
+    justify-content: center;
+}
+
+
 .hidden-input {
   display: none;
 }

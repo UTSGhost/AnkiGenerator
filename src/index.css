@@ -18,6 +18,7 @@
   --background-medium: #070708;
   --background-dark: #000000;
   --text-color: #fff;
+  --success: #7ddc90;
 }
 
 .light-mode {
@@ -31,6 +32,7 @@
   --button-hover: #322f64a7;
   --highlight-color: #443178;
   --sticky-bg: rgba(255, 255, 255, 0.9);
+  --success: #1e9736;
 }
 
 /* =========================================

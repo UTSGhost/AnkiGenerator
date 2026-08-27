@@ -90,10 +90,11 @@ function App() {
                 </div>
                 <button className="submit-button" type="submit" disabled={isLoading || !isSqlReady} >{isLoading ? "Busy..." : "Create Deck"}</button>
             </form>
-            {isLoading && (<div id="loader">Loading...</div>)}
-            
-            {error && (<div id="error">{error}</div>)}
-            {success && (<div id="error">Deck successfully generated!</div>)}
+            <div className="response-div">
+                {isLoading && (<div className="loader">Loading...</div>)}
+                {error && (<div className="error">{error}</div>)}
+                {success && (<div className="success">Deck successfully generated!</div>)}
+            </div>
         </div>
     )
 }
