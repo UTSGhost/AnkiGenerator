@@ -9,6 +9,7 @@ from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = '.'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+GEMINI_MODEL = "gemini-3.1-flash-lite"
 
 app = Flask(__name__)
 app.secret_key = "randompassword"
@@ -24,35 +25,35 @@ def hello_world(name=None):
 
 @app.post("/")
 def upload_file():
-    # no file
-    if 'file' not in request.files:
-        return 'no file!', 400
     # from html form
-    file = request.files['file']
-    # empty file created by browser
+    file = request.files.get('file')
+    api_key = request.form.get('key')
+    # bad or missing input
+    if not file:
+        return 'no file!', 400
     if file.filename == '':
         return 'no file!', 400
+    if not api_key:
+        return 'no api_key', 400
+
+    client = genai.Client(api_key=api_key)
     
     if file and allowed_file(file.filename):
             filename = secure_filename(file.filename) # type: ignore
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(filepath)
             # AI request
-            json = requestJson(filepath)
+            deck = fetchAi(filepath, client)
+            # self healing
+            goodCards, badCards = checkForError(deck)
+            if badCards:
+                fixedCards = fixVerbAi(badCards, client)
+                deck = Deck(cards = (fixedCards.cards + goodCards))
             # genanki deck generation
-            output_path = createDeck(json)
+            output_path = createDeck(deck)
             # as attachment to download
             return send_file(output_path,as_attachment=True)
     return 'wrong fileformat!', 400
-
-
-
-# put your Gemini API key into .env in root
-load_dotenv()
-test_key = os.getenv("GEMINI_API_KEY")
-# for debugging only
-# print(f"Key: {test_key}") 
-
 
 class Card(BaseModel):
     translation: str = Field(description="The German translation of the word.")
@@ -64,8 +65,6 @@ class Card(BaseModel):
 
 class Deck(BaseModel):
     cards: List[Card]
-
-client = genai.Client()
 
 with (
     open("templates/front.html", "r", encoding="utf-8") as f_front,
@@ -85,11 +84,11 @@ with (
     prompt = f_prompt.read()
 
 #send data to AI
-def requestJson(filepath):
+def fetchAi(filepath, client):
     gemini_input_file = client.files.upload(file=filepath)
 
     interaction = client.interactions.create(
-        model="gemini-3.7-flash",
+        model=GEMINI_MODEL,
         input=[
             {"type": "text", "text": prompt},
             {
@@ -113,14 +112,52 @@ def requestJson(filepath):
     # should never be raised, but safer to check
     if not (interaction.output_text): # type: ignore
         raise ValueError("no output text")
-    return interaction.output_text # type: ignore
+    return Deck.model_validate_json(interaction.output_text) # type: ignore
+
+def checkForError(deck):
+    goodCards = []
+    badCards = []
+    for card in deck.cards:
+        if ((card.masu or card.dictionary) and not (card.masu and card.dictionary and card.japanese)):
+            badCards.append(card)
+        else:
+            goodCards.append(card)
+    return goodCards, badCards
 
 
-def createDeck(json):
-    deck = Deck.model_validate_json(json)
-    # for debugging
-    print(deck)
+def fixVerbAi(badCards, client):
+    #send data to AI
+    interaction = client.interactions.create(
+        model = GEMINI_MODEL,
+        input = [{
+            "type": "text", 
+            "text": "You are an expert Japanese linguist and data processor. Your task is to fix the missing or incorrect verb conjugations in the provided JSON array of flashcards. Apply the following strict rules to EVERY card:\n" +
+                    "1. 'japanese' and 'masu' MUST both contain the exact same Japanese Masu-form of the verb (e.g., 食べます).\n" +
+                    "2. 'dictionary' MUST contain the Japanese Dictionary-form of the verb (e.g., 食べる).\n" +
+                    "3. 'translation': Keep the existing German translation verbatim unless it is objectively incorrect.\n" +
+                    "4. 'details' and 'information': DO NOT modify these fields under any circumstances. Copy them exactly as provided.\n" +
+                    "JSON data: " + Deck(cards=badCards).model_dump_json() # create json text for LLM
+        }],
+        response_format={
+            "type": "text",
+            "mime_type": "application/json",
+            "schema": Deck.model_json_schema()
+        },
+        extra_body={
+            "generation_config": {
+                "temperature": 0.0
+            }
+        }
+    )
 
+    # should never be raised, but safer to check
+    if not (interaction.output_text): # type: ignore
+        raise ValueError("no output text")
+
+
+    return Deck.model_validate_json(interaction.output_text) # type: ignore
+
+def createDeck(deck):
     # necessary for genanki model -> https://darigovresearch.github.io/genanki/build/html/overview.html
     MODEL_ID_NORMAL = 1638294712
     MODEL_ID_VERB = 1847201948
