@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { initSql, fileTob64, fetchAi, checkForAiError, fixAiCards, createDeck } from './ankiService';
 import Header from './Header';
+import './App.css';
 
 function App() {
     const [isDarkMode, setIsDarkMode] = useState(true);
@@ -9,6 +10,7 @@ function App() {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
     const toggleTheme = () => setIsDarkMode(!isDarkMode);
+    const [fileName, setFileName] = useState("No file selected");
     
     // initialize sql
     useEffect(() => {
@@ -60,13 +62,33 @@ function App() {
     return (
         <div className={`theme-wrapper ${isDarkMode ? 'dark-mode' : 'light-mode'}`}>
             <Header isDarkMode={isDarkMode} onToggle={toggleTheme} />
-            Anki Generator
-            <form id="upload-form" onSubmit={handleUpload}>
-            Input file:
-            <input type="file" name="file" />
-            API key:
-            <input type="password" name="key" />
-            <button type="submit" disabled={isLoading || !isSqlReady} >{isLoading ? "Busy..." : "Create Deck"}</button>
+            <form className="upload-form" onSubmit={handleUpload}>
+                <div className="input-fields">
+                    <div className="input-box">
+                        <label className="input-describtion">Upload your Image:</label>
+                        <label className="custom-file-upload">
+                            <span className="button-text">📁 Select file</span>
+                            <input 
+                                type="file" 
+                                name="file" 
+                                className="hidden-input"
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        setFileName(e.target.files[0].name);
+                                    } else {
+                                        setFileName("No file selected");
+                                    }
+                                }}
+                            />
+                        </label>
+                        <span className="file-name-display">{fileName}</span>
+                    </div>
+                    <div className="input-box">
+                        <label className="input-describtion">API key:</label>
+                        <input type="password" name="key" />
+                    </div>
+                </div>
+                <button className="submit-button" type="submit" disabled={isLoading || !isSqlReady} >{isLoading ? "Busy..." : "Create Deck"}</button>
             </form>
             {isLoading && (<div id="loader">Loading...</div>)}
             

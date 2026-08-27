@@ -1,0 +1,19 @@
+{
+  "id": "space-mono",
+  "family": "Space Mono",
+  "subsets": ["latin", "latin-ext", "vietnamese"],
+  "weights": [400, 700],
+  "styles": ["italic", "normal"],
+  "defSubset": "latin",
+  "variable": false,
+  "lastModified": "2025-06-25",
+  "version": "v17",
+  "category": "monospace",
+  "license": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2016 The Space Mono Project Authors (https://github.com/googlefonts/spacemono) SpaceMono-Italic.ttf: Copyright 2016 The Space Mono Project Authors (https://github.com/googlefonts/spacemono) SpaceMono-Bold.ttf: Copyright 2016 The Space Mono Project Authors (https://github.com/googlefonts/spacemono) SpaceMono-BoldItalic.ttf: Copyright 2016 The Space Mono Project Authors (https://github.com/googlefonts/spacemono)"
+  },
+  "source": "https://github.com/google/fonts",
+  "type": "google"
+}

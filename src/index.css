@@ -1,20 +1,85 @@
+/* =========================================
+   1. VARIABLEN & THEMES
+   ========================================= */
 :root {
-    --highlight-color: #5352ed;
-    --background-medium: #070708;
-    --background-dark: #000000;
-    --text-color: #fff;
+  --bg-color: #0f172a;
+  --input-bg: #1e293b;
+  --text-color: #f1f5f9; 
+  --text-muted: #94a3b8;
+  --accent-color: #6d79eb;
+  --border-color: #475569;
+  --button-bg: #334155;
+  --button-hover: #475569;
+  --score-text: #ffffff;
+  --highlight-color: #a487f4;
+  --sticky-bg: rgba(30, 41, 59, 0.9);
+  font-family: "Nunito Variable" , sans-serif;
+  --highlightcard-color: #5352ed;
+  --background-medium: #070708;
+  --background-dark: #000000;
+  --text-color: #fff;
 }
 
-html {
-    background-color: var(--background-medium);
-    color: var(--text-color);
-    font-family: 'Nunito', sans-serif;
+.light-mode {
+  --bg-color: #f4f4f4;
+  --input-bg: #ffffff;
+  --text-color: #0f172a;
+  --text-muted: #64748b;
+  --accent-color: #322f64;
+  --border-color: #e2e8f0;
+  --button-bg: #f1f5f9;
+  --button-hover: #322f64a7;
+  --highlight-color: #443178;
+  --sticky-bg: rgba(255, 255, 255, 0.9);
 }
 
-
-#loader {
-    display: none;
+/* =========================================
+   2. GLOBAL STYLES
+   ========================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
-#error {
-    color: red;
+
+html,
+body {
+  max-width: 100%;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.theme-wrapper {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+a {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+@media (max-width: 768px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+}
+
+button {
+  font-family: "Nunito Variable";
+  background-color: var(--button-bg);
+  color: var(--text-color);
+  border: none;
+}
+button:hover{
+  background-color: var(--button-hover);
 }
