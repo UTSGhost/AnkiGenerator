@@ -18,6 +18,9 @@ Currently built for DE -> JP (German to Japanese) including automatic Masu -> Di
 </table>
 
 ## How to use
+
+You can visit [my site](https://anki.utsghost.dev/) to try it out, or host it yourself:
+
 1. **Clone the repository and switch branch:**
    ```bash
    git clone https://github.com/UTSGhost/AnkiGenerator
