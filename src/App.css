@@ -43,6 +43,7 @@
     padding: 8px 16px;
     font-size: 18px;
     transition: background-color 0.2s;
+    margin-top: 10px;
 }
 .input-box input[type="password"],
 .input-box input[type="text"] {
@@ -69,4 +70,10 @@
 }
 .hidden-input {
   display: none;
+}
+
+@media (max-width: 768px) {
+    .input-fields {
+        flex-direction: column;
+    }
 }
