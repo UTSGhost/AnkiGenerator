@@ -96,7 +96,6 @@ def upload_file():
             # delete image file
             if os.path.exists(filepath):
                 try:
-                    print(filepath)
                     os.remove(filepath)
                 except Exception as e:
                     print(f"Error while trying to remove image: {e}")
