@@ -177,7 +177,7 @@ export async function fetchAi(b64, type, apiKey){
     // some API error
     if (!response.ok) {
         console.error("GOOGLE API ERROR:", JSON.stringify(json, null, 2));
-        throw new Error(response.error?.message || "Unknown API-Error");
+        throw new Error(json[0].error.message || "Unknown API-Error");
     }
     // weird way to extract important data from response because nothing else works
     let jsonString = null;
@@ -287,7 +287,7 @@ export async function fixAiCards(badCards, apiKey){
     // some API error
     if (!response.ok) {
         console.error("GOOGLE API ERROR ON SECOND CALL:", JSON.stringify(json, null, 2));
-        throw new Error(response.error?.message || "Unknown API-Error on second call");
+        throw new Error(json[0].error.message || "Unknown API-Error");
     }
     // weird way to extract important data from response because nothing else works
     let jsonString = null;

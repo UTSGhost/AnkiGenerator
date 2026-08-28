@@ -32,8 +32,14 @@ function App() {
         const apiKey = formData.get("key");
         // main logic using ankiService.js
         try {
-            if(isSqlReady == false){
-                throw new Error("System not initialized")
+            if(!isSqlReady){
+                throw new Error("Error: System not initialized")
+            }
+            if(!apiKey) {
+                throw new Error("Error: API-key missing")
+            }
+            if(!file || file.name === "" || file.size === 0) {
+                throw new Error("Error: File missing")
             }
             const b64 = await fileTob64(file);
             let json = await fetchAi(b64, file.type, apiKey);
@@ -67,25 +73,26 @@ function App() {
                     <div className="input-box">
                         <label className="input-describtion">Upload your Image:</label>
                         <label className="custom-file-upload">
-                            <span className="button-text">📁 Select file</span>
-                            <input 
-                                type="file" 
-                                name="file" 
-                                className="hidden-input"
-                                onChange={(e) => {
-                                    if (e.target.files && e.target.files[0]) {
-                                        setFileName(e.target.files[0].name);
-                                    } else {
-                                        setFileName("No file selected");
-                                    }
-                                }}
-                            />
+                        <span>📁 Select file</span>
+                        <input 
+                            type="file" 
+                            name="file" 
+                            className="hidden-input"
+                            onChange={(e) => {
+                                if (e.target.files && e.target.files[0]) {
+                                    setFileName(e.target.files[0].name);
+                                } else {
+                                    setFileName("No file selected");
+                                }
+                            }}
+                        />
                         </label>
-                        <span className="file-name-display">{fileName}</span>
+                        <span className="button-text file-name" title={fileName}>{fileName}</span>
                     </div>
                     <div className="input-box">
                         <label className="input-describtion">API key:</label>
                         <input type="password" name="key" />
+                        <a href="https://aistudio.google.com/api-keys" target="_blank" className="button-text api-link">Get your API-key here</a>
                     </div>
                 </div>
                 <button className="submit-button" type="submit" disabled={isLoading || !isSqlReady} >{isLoading ? "Busy..." : "Create Deck"}</button>
