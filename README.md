@@ -19,7 +19,7 @@ Currently built for DE -> JP (German to Japanese) including automatic Masu -> Di
 
 ## How to use
 
-You can visit [my site](https://anki.utsghost.dev/) to try it out, or host it yourself:
+You can visit [my site](https://anki.utsghost.dev/){:target="_blank"} to try it out, or host it yourself:
 
 1. **Clone the repository and switch branch:**
    ```bash
