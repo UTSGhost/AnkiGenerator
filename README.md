@@ -33,7 +33,7 @@ If you have Docker Desktop installed, you can run the [Full-stack Webserver bran
 2. **Generate Cards:**
    Open your browser and navigate to `http://127.0.0.1:5000`. Upload your vocabulary image and API key via the web interface and wait for the `.apkg` file to download automatically.
 
-### Option 2: If you want to hack the code locally
+### Option 2: If you want to run or modify the core Python script directly on your machine:
 1. **Clone the repository:**
 
    ```bash
