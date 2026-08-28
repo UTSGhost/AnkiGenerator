@@ -90,7 +90,7 @@ function App() {
                         <span className="button-text file-name" title={fileName}>{fileName}</span>
                     </div>
                     <div className="input-box">
-                        <label className="input-describtion">API key:</label>
+                        <label className="input-describtion">API-key:</label>
                         <input type="password" name="key" />
                         <a href="https://aistudio.google.com/api-keys" target="_blank" className="button-text api-link">Get your API-key here</a>
                     </div>
